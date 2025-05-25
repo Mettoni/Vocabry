@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Vocabry</string>
+    <string name="app_name">TEST</string>
+    <string name="zadaj_slovo">Zadaj slovo</string>
+    <string name="potvrdit">Potvrdit</string>
 </resources>
