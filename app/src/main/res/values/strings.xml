@@ -2,4 +2,6 @@
     <string name="app_name">TEST</string>
     <string name="zadaj_slovo">Zadaj slovo</string>
     <string name="potvrdit">Potvrdit</string>
+    <string name="prid_vanie_slova">Pridávanie slova</string>
+    <string name="odoberanie_slova">Odoberanie slova</string>
 </resources>

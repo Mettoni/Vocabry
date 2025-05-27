@@ -1,9 +1,9 @@
 package com.example.vocabry.domain.usecase
 
-import com.example.vocabry.data.WordFunctions
+import com.example.vocabry.domain.WordFunctions
 
 class RemoveWordUseCase(private val wordLis: WordFunctions) {
-    operator fun invoke(word:String) {
-        wordLis.removeWord(word)
+    suspend operator fun invoke(word:String,category:String) {
+        wordLis.removeWord(word,category)
     }
 }

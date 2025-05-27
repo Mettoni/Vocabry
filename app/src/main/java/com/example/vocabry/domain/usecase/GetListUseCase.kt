@@ -1,9 +1,10 @@
 package com.example.vocabry.domain.usecase
 
-import com.example.vocabry.data.WordFunctions
+import com.example.vocabry.domain.Word
+import com.example.vocabry.domain.WordFunctions
 
 class GetListUseCase(private val wordLis: WordFunctions) {
-    operator fun invoke(): List<String> {
+    suspend operator fun invoke(): List<Word> {
         return wordLis.getAllWords()
     }
 }

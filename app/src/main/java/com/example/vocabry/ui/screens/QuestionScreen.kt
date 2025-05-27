@@ -72,13 +72,11 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = 32.dp,
-                end = 32.dp,
-                top = if(isLandscape) 80.dp else 32.dp
-            ),
+        modifier = Modifier.fillMaxSize().padding(
+            start = 32.dp,
+            end = 32.dp,
+            top = if(isLandscape) 80.dp else 32.dp
+        ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -87,9 +85,7 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
             fontFamily = poppins,
-            modifier = Modifier
-                .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
-                .padding(8.dp)
+            modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp)).padding(8.dp)  // nastav si hrúbku a farbu rámika
         )
 
         Spacer(modifier = Modifier.height(16.dp))

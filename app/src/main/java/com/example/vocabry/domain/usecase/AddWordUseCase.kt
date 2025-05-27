@@ -1,11 +1,11 @@
 package com.example.vocabry.domain.usecase
 
-import com.example.vocabry.data.WordFunctions
+import com.example.vocabry.domain.WordFunctions
 
 class AddWordUseCase(
     private val wordLis: WordFunctions
 ) {
-    operator fun invoke(word: String) {
-        wordLis.addWord(word)
+    suspend operator fun invoke(word: String,translation: String, category: String) {
+        wordLis.addWord(word,translation,category)
     }
 }

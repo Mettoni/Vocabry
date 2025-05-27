@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -44,17 +43,21 @@ import com.example.vocabry.ui.viewModel.MainViewModel
 @Composable
 fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostController) {
     var wordInput by remember { mutableStateOf("") }
+    var translationInput by remember { mutableStateOf("") }
+    var categoryInput by remember { mutableStateOf("") }
     var isAddingMode by remember { mutableStateOf(true) }
 
     val words by viewModel.wordList.collectAsState()
 
     TopAppBar(
-        title = { Text("")},
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
+        title = { Text("") },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
             titleContentColor = Color.Black,
-            navigationIconContentColor = Color.Black),
+            navigationIconContentColor = Color.Black
+        ),
         navigationIcon = {
-            IconButton(onClick = {navHostController.popBackStack()}) {
+            IconButton(onClick = { navHostController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Späť"
@@ -69,143 +72,83 @@ fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostControl
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(
-                horizontal = 40.dp,
-                vertical = if (isLandscape) 10.dp else 10.dp
-            )
+            .padding(horizontal = 40.dp, vertical = if (isLandscape) 10.dp else 10.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         EditTextField(
-            label = stringResource(R.string.zadaj_slovo),
+            label = "Slovo",
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Next
             ),
             value = wordInput,
             onValueChanged = { wordInput = it },
             modifier = Modifier
-                .padding(
-                    start = if (isLandscape) 15.dp else 0.dp,
-                    top = if (isLandscape) 10.dp else 100.dp
-                )
+                .padding(top = if (isLandscape) 10.dp else 100.dp)
                 .fillMaxWidth()
         )
-        if(!isLandscape) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 0.dp, start = 100.dp )
-            ){
-                Text(
-                    text = if(isAddingMode) "Pridávanie slova" else "Odoberanie slova",
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Switch(
-                    checked = isAddingMode,
-                    onCheckedChange = { isAddingMode = it }
-                )
-            }
+        EditTextField(
+            label = "Preklad",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            value = translationInput,
+            onValueChanged = { translationInput = it },
+            modifier = Modifier.fillMaxWidth()
+        )
+        EditTextField(
+            label = "Kategória",
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            value = categoryInput,
+            onValueChanged = { categoryInput = it },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            Button(
-                onClick = {
-                    if (wordInput.isNotBlank()) {
-                        if(isAddingMode && !viewModel.wordList.value.contains(wordInput)) {
-                            viewModel.addWord(wordInput.trim())
-                        } else if(!isAddingMode){
-                            viewModel.removeWord(wordInput.trim())
-                        } else {
-                            println("nic")
-                        }
-                        wordInput= ""
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(
+                text = if (isAddingMode) "Pridávanie slova" else "Odoberanie slova",
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Switch(
+                checked = isAddingMode,
+                onCheckedChange = { isAddingMode = it }
+            )
+        }
+
+        Button(
+            onClick = {
+                if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
+                    if (isAddingMode) {
+                        viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim())
+                    } else {
+                        viewModel.removeWord(wordInput.trim(), categoryInput.trim())
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Text(stringResource(R.string.potvrdit))
-            }
-        } else {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-            ) {
-                Button(
-                    onClick = {
-                        if (wordInput.isNotBlank()) {
-                            if (isAddingMode && !viewModel.wordList.value.contains(wordInput)) {
-                                viewModel.addWord(wordInput.trim())
-                            } else if (!isAddingMode) {
-                                viewModel.removeWord(wordInput.trim())
-                            } else {
-                                println("nic")
-                            }
-                            wordInput = ""
-                        }
-                    },
-                    modifier = Modifier
-                        .width(450.dp)
-                        .padding(bottom = 350.dp,)
-                ) {
-                    Text(stringResource(R.string.potvrdit))
+                    wordInput = ""
+                    translationInput = ""
+                    categoryInput = ""
                 }
-
-                Text(
-                    text = if(isAddingMode) "Pridávanie slova" else "Odoberanie slova",
-                    modifier = Modifier.padding(start = 100.dp,
-                        bottom = 350.dp)
-                )
-                Switch(
-                    checked = isAddingMode,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 350.dp),
-                    onCheckedChange = { isAddingMode = it }
-                )
-            }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(stringResource(R.string.potvrdit))
         }
-        Text("Zoznam slov:")
+
+        Text("Zoznam slov:", modifier = Modifier.padding(top = 16.dp))
         words.forEach { word ->
-            Text(text = "• $word")
+            Text(text = "• ${word.word} – ${word.translated} [${word.category}]")
         }
     }
-
-    /*
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 0.dp, start = if(isLandscape) 550.dp else 100.dp )
-    ){
-        Text(
-            text = if(isAddingMode) "Pridávanie slova" else "Odoberanie slova",
-            modifier = Modifier.padding(end = 8.dp)
-        )
-        Switch(
-            checked = isAddingMode,
-            onCheckedChange = { isAddingMode = it }
-        )
-    }
-
-
-    Button(
-        onClick = {
-            if (wordInput.isNotBlank()) {
-                if(isAddingMode && !viewModel.wordList.value.contains(wordInput)) {
-                    viewModel.addWord(wordInput.trim())
-                } else if(!isAddingMode){
-                    viewModel.removeWord(wordInput.trim())
-                } else {
-                    println("nic")
-                }
-                wordInput= ""
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = if(isLandscape) 0.dp else 16.dp)
-    ) {
-        Text(stringResource(R.string.potvrdit))
-    }
-
-     */
 }
 
 @Composable
