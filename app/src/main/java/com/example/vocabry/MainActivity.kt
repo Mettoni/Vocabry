@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.vocabry.data.UseWordFunctions
+import com.example.vocabry.data.RoomUseWordFunctions
+import com.example.vocabry.data.WordDatabase
 import com.example.vocabry.domain.usecase.AddWordUseCase
 import com.example.vocabry.domain.usecase.GenerateButtonOptions
 import com.example.vocabry.domain.usecase.GetListUseCase
@@ -24,13 +25,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val repository = UseWordFunctions()
+        val database = WordDatabase.getDatabase(applicationContext)
+        val dao = database.wordDao()
+        val wordFunctions = RoomUseWordFunctions(dao)
 
         val viewModelFactory = MainViewModelFactory(
-            AddWordUseCase(repository),
-            RemoveWordUseCase(repository),
-            GetListUseCase(repository),
-            GenerateButtonOptions(repository)
+            AddWordUseCase(wordFunctions),
+            RemoveWordUseCase(wordFunctions),
+            GetListUseCase(wordFunctions),
+            GenerateButtonOptions(wordFunctions)
         )
 
         enableEdgeToEdge()
