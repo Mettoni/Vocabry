@@ -27,8 +27,14 @@ class MainViewModel (
     private val _correctWord = MutableStateFlow<Word?>(null)
     val correctWord: StateFlow<Word?> = _correctWord
 
+    private val _alreadyUsed = MutableStateFlow<List<Word>>(emptyList())
+    val alreadyUsed: StateFlow<List<Word>> = _alreadyUsed
+
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score
+
+    private val _gameFinished = MutableStateFlow(false)
+    val gameFinished: StateFlow<Boolean> = _gameFinished
 
     fun addWord(word: String,translation: String, category: String) {
         viewModelScope.launch {
@@ -45,6 +51,23 @@ class MainViewModel (
     fun generateNewQuestion() {
         viewModelScope.launch {
             val allWords = getList()
+            val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
+            if(!unusedWords.isEmpty()) {
+                val correct = unusedWords.random()
+                val options = generateOptions(correct)
+
+                _correctWord.value = correct
+                _options.value = options
+                _alreadyUsed.value += correct
+            } else {
+                _gameFinished.value = true
+            }
+        }
+
+
+        /*
+        viewModelScope.launch {
+            val allWords = getList()
             if(allWords.size >= 4) {
                 val correct = allWords.random()
                 val options = generateOptions(correct)
@@ -53,6 +76,14 @@ class MainViewModel (
                 _options.value = options
             }
         }
+         */
+    }
+    fun resetGame() {
+        _alreadyUsed.value = emptyList()
+        _score.value = 0
+        _correctWord.value = null
+        _options.value = emptyList()
+        _gameFinished.value = false
     }
     fun refreshWords() {
         viewModelScope.launch {

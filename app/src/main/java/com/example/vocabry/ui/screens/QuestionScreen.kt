@@ -36,16 +36,19 @@ import androidx.navigation.NavHostController
 import com.example.vocabry.ui.viewModel.MainViewModel
 import com.example.vocabry.R
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostController) {
     val guessedWord by viewModel.correctWord.collectAsState()
     val options by viewModel.options.collectAsState()
+    val gameFinished by viewModel.gameFinished.collectAsState()
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val score by viewModel.score.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.generateNewQuestion()
     }
@@ -63,7 +66,8 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = {navHostController.popBackStack()}) {
+            IconButton(onClick = {navHostController.popBackStack()
+                viewModel.resetGame()}) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Späť"
@@ -71,47 +75,94 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             }
         }
     )
-    Text(
-        text = "Skóre: $score",
-        fontSize = 15.sp,
-        modifier = Modifier.padding(top = 100.dp)
-    )
+    if(gameFinished) {
+        EndGame(
+            score = score,
+            correctAnswers = if(score > 0) score/100 else 0,
+            onRestart = {
+                viewModel.resetGame()
+                viewModel.generateNewQuestion()
+            },
+            onBackToMenu = {
+                viewModel.resetGame()
+                navHostController.popBackStack()
+            }
 
+        )
+    } else {
+        Text(
+            text = "Skóre: $score",
+            fontSize = 15.sp,
+            modifier = Modifier.padding(top = 100.dp)
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(
+                start = 32.dp,
+                end = 32.dp,
+                top = if (isLandscape) 80.dp else 32.dp
+            ),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Ako sa povie po anglicky: ${guessedWord?.word}",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                fontFamily = poppins,
+                modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+                    .padding(8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            for (i in 0..3) {
+                val word = options.getOrNull(i) ?: continue
+                //val translation = translator.translateBlocking(word, Language.ENGLISH, Language.SLOVAK)
+
+                val isCorrect = word == guessedWord
+                Button(
+                    onClick = {
+                        if (isCorrect) {
+                            viewModel.addScore(100)
+                        }
+                        viewModel.generateNewQuestion()
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(4.dp)
+                ) {
+                    Text(text = word.translated)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EndGame(
+    score:Int,
+    correctAnswers:Int,
+    onRestart: ()-> Unit,
+    onBackToMenu: ()-> Unit
+
+){
     Column(
-        modifier = Modifier.fillMaxSize().padding(
-            start = 32.dp,
-            end = 32.dp,
-            top = if(isLandscape) 80.dp else 32.dp
-        ),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Ako sa povie po anglicky: ${guessedWord?.word}",
-            fontSize = 20.sp,
+            text = "Tvoje finálne skóre je: $score\nSprávne odpovede: $correctAnswers",
             textAlign = TextAlign.Center,
-            fontFamily = poppins,
-            modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp)).padding(8.dp)  // nastav si hrúbku a farbu rámika
+            fontSize = 20.sp,
+            modifier = Modifier.padding(bottom = 32.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        for (i in 0..3) {
-            val word = options.getOrNull(i) ?: continue
-            //val translation = translator.translateBlocking(word, Language.ENGLISH, Language.SLOVAK)
-
-            val isCorrect = word == guessedWord
-            Button(
-                onClick = {
-                    if(isCorrect) {
-                        viewModel.addScore(100)
-                    }
-                    viewModel.generateNewQuestion()
-                },
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
-            ) {
-                Text(text = word.translated)
-            }
+        Button(onClick = onRestart, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Text("Reštartovať")
+        }
+        Button(onClick = onBackToMenu, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Text("Späť do menu")
         }
     }
 }
