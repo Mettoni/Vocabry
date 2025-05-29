@@ -14,18 +14,21 @@ import kotlinx.coroutines.launch
 
 class MainViewModel (
     private val addWordUseCase: AddWordUseCase,
-    private val removeWord: RemoveWordUseCase,
+    private val removeWordUseCase: RemoveWordUseCase,
     private val getList: GetListUseCase,
     private val generateOptions: GenerateButtonOptions,
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
     val wordList: StateFlow<List<Word>> = _wordList
 
-    private val _options = MutableStateFlow<List<String>>(emptyList())
-    val options: StateFlow<List<String>> = _options
+    private val _options = MutableStateFlow<List<Word>>(emptyList())
+    val options: StateFlow<List<Word>> = _options
 
-    private val _correctWord = MutableStateFlow("")
-    val correctWord: StateFlow<String> = _correctWord
+    private val _correctWord = MutableStateFlow<Word?>(null)
+    val correctWord: StateFlow<Word?> = _correctWord
+
+    private val _score = MutableStateFlow(0)
+    val score: StateFlow<Int> = _score
 
     fun addWord(word: String,translation: String, category: String) {
         viewModelScope.launch {
@@ -35,7 +38,7 @@ class MainViewModel (
     }
     fun removeWord(word:String,category: String) {
         viewModelScope.launch {
-            removeWord(word,category)
+            removeWordUseCase(word,category)
             refreshWords()
         }
     }
@@ -44,9 +47,9 @@ class MainViewModel (
             val allWords = getList()
             if(allWords.size >= 4) {
                 val correct = allWords.random()
-                val options = generateOptions(correct.word)
+                val options = generateOptions(correct)
 
-                _correctWord.value = correct.word
+                _correctWord.value = correct
                 _options.value = options
             }
         }
@@ -55,6 +58,9 @@ class MainViewModel (
         viewModelScope.launch {
             _wordList.value = getList()
         }
+    }
+    fun addScore(score:Int) {
+        _score.value += score
     }
 
 }

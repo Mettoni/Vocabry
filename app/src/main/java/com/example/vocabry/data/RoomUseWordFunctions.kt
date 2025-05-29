@@ -5,8 +5,6 @@ import com.example.vocabry.domain.WordFunctions
 
 class RoomUseWordFunctions(private val dao: WordDao): WordFunctions {
 
-    private val buttonList = mutableListOf<String>()
-
     override suspend fun getAllWords(): List<Word> { //= wordList
         return dao.getAllWords().map { it.toDomain() }
     }
@@ -23,18 +21,18 @@ class RoomUseWordFunctions(private val dao: WordDao): WordFunctions {
         dao.deleteWord(word,category)
     }
 
-    override suspend fun getButtonOptions(correctWord: String): List<String> {
-        val wordList = dao.getAllWords().map { it.word }
-
+    override suspend fun getButtonOptions(correctWord: Word): List<Word> {
+        val wordList = dao.getAllWords().filter{it.word != correctWord.word}
+        val buttonList = mutableListOf<WordEntity>()
         buttonList.clear()
-        buttonList.add(correctWord)
+        buttonList.add(correctWord.toEntity())
 
         while(buttonList.size < 4) {
             val newWord = wordList.random()
-            if(!buttonList.contains(newWord)) {
+            if(buttonList.none { it.word == newWord.word }) {
                 buttonList.add(newWord)
             }
         }
-        return buttonList.shuffled()
+        return buttonList.shuffled().map {it.toDomain()}
     }
 }

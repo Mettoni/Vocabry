@@ -45,6 +45,7 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    val score by viewModel.score.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.generateNewQuestion()
     }
@@ -70,6 +71,11 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             }
         }
     )
+    Text(
+        text = "Skóre: $score",
+        fontSize = 15.sp,
+        modifier = Modifier.padding(top = 100.dp)
+    )
 
     Column(
         modifier = Modifier.fillMaxSize().padding(
@@ -81,7 +87,7 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Ako sa povie po anglicky: $guessedWord",
+            text = "Ako sa povie po anglicky: ${guessedWord?.word}",
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
             fontFamily = poppins,
@@ -97,11 +103,14 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             val isCorrect = word == guessedWord
             Button(
                 onClick = {
-                    println(if (isCorrect) "SPRÁVNE" else "NESPRÁVNE")
+                    if(isCorrect) {
+                        viewModel.addScore(100)
+                    }
+                    viewModel.generateNewQuestion()
                 },
                 modifier = Modifier.fillMaxWidth().padding(4.dp)
             ) {
-                Text(word)
+                Text(text = word.translated)
             }
         }
     }
