@@ -21,14 +21,12 @@ import com.example.vocabry.ui.AppScreen
 fun MainMenu(navController: NavController) {
     val activity = LocalContext.current as? Activity
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 40.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 40.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
-                navController.navigate(AppScreen.Start.route)
+                navController.navigate(AppScreen.Category.route)
             },
             modifier = Modifier.fillMaxWidth()
         ) {

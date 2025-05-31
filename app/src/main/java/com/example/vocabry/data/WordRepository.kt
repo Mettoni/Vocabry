@@ -3,7 +3,7 @@ package com.example.vocabry.data
 import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.WordFunctions
 
-class RoomUseWordFunctions(private val dao: WordDao): WordFunctions {
+class WordRepository(private val dao: WordDao): WordFunctions {
 
     override suspend fun getAllWords(): List<Word> { //= wordList
         return dao.getAllWords().map { it.toDomain() }
@@ -19,6 +19,14 @@ class RoomUseWordFunctions(private val dao: WordDao): WordFunctions {
         //wordList.remove(word)
         //možno budem potrebovať withContext(Dispatchers.IO) keby aplikácie neresponduje
         dao.deleteWord(word,category)
+    }
+
+    override suspend fun getAllCategories(): List<String> {
+        return dao.getAllCategories()
+    }
+
+    override suspend fun getWordsByCategory(category: String): List<Word> {
+        return dao.getByCategory(category).map{it.toDomain()}
     }
 
     override suspend fun getButtonOptions(correctWord: Word): List<Word> {

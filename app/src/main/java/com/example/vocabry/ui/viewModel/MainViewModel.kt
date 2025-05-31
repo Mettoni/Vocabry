@@ -6,6 +6,7 @@ import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.usecase.AddWordUseCase
 import com.example.vocabry.domain.usecase.GenerateButtonOptions
 import com.example.vocabry.domain.usecase.GetListUseCase
+import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 class MainViewModel (
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
+    private val categoryWords:GetWordsByCategoryUseCase,
     private val getList: GetListUseCase,
     private val generateOptions: GenerateButtonOptions,
 ): ViewModel() {
@@ -48,9 +50,9 @@ class MainViewModel (
             refreshWords()
         }
     }
-    fun generateNewQuestion() {
+    fun generateNewQuestion(category: String) {
         viewModelScope.launch {
-            val allWords = getList()
+            val allWords = categoryWords(category)
             val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
             if(!unusedWords.isEmpty()) {
                 val correct = unusedWords.random()

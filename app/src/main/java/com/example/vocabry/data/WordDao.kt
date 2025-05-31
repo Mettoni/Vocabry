@@ -10,6 +10,9 @@ interface WordDao {
     @Query("SELECT * from words")
     suspend fun getAllWords(): List<WordEntity>
 
+    @Query("SELECT DISTINCT category FROM words")
+    suspend fun getAllCategories(): List<String>
+
     @Query("SELECT * from words where category = :type")
     suspend fun getByCategory(type: String): List<WordEntity>
 

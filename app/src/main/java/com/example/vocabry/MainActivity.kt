@@ -10,14 +10,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.vocabry.data.RoomUseWordFunctions
+import com.example.vocabry.data.WordRepository
 import com.example.vocabry.data.WordDatabase
 import com.example.vocabry.domain.usecase.AddWordUseCase
 import com.example.vocabry.domain.usecase.GenerateButtonOptions
+import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
+import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
 import com.example.vocabry.ui.AppNavigation
 import com.example.vocabry.ui.theme.VocabryTheme
+import com.example.vocabry.ui.viewModel.CategoryViewModel
+import com.example.vocabry.ui.viewModel.CategoryViewModelFactory
 import com.example.vocabry.ui.viewModel.MainViewModel
 import com.example.vocabry.ui.viewModel.MainViewModelFactory
 
@@ -27,13 +31,19 @@ class MainActivity : ComponentActivity() {
 
         val database = WordDatabase.getDatabase(applicationContext)
         val dao = database.wordDao()
-        val wordFunctions = RoomUseWordFunctions(dao)
+        val wordFunctions = WordRepository(dao)
+
 
         val viewModelFactory = MainViewModelFactory(
             AddWordUseCase(wordFunctions),
             RemoveWordUseCase(wordFunctions),
             GetListUseCase(wordFunctions),
-            GenerateButtonOptions(wordFunctions)
+            GenerateButtonOptions(wordFunctions),
+            GetWordsByCategoryUseCase(wordFunctions)
+        )
+        val categoryViewModelFactory = CategoryViewModelFactory(
+            GetAllCategoriesUseCase(wordFunctions),
+            GetWordsByCategoryUseCase(wordFunctions)
         )
 
         enableEdgeToEdge()
@@ -41,10 +51,12 @@ class MainActivity : ComponentActivity() {
             VocabryTheme {
                 val navController = rememberNavController()
                 val viewModel: MainViewModel = viewModel(factory = viewModelFactory)
+                val categoryViewModel: CategoryViewModel = viewModel(factory = categoryViewModelFactory)
 
                 AppNavigation(
                     navController = navController,
                     viewModel = viewModel,
+                    categoryViewModel = categoryViewModel,
                     modifier = Modifier
                 )
             }

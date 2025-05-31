@@ -7,12 +7,15 @@ import com.example.vocabry.ui.viewModel.MainViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.vocabry.ui.screens.CategorySelect
 import com.example.vocabry.ui.screens.QuestionScreen
 import com.example.vocabry.ui.screens.WordAddingScreen
+import com.example.vocabry.ui.viewModel.CategoryViewModel
 
 enum class AppScreen(val route: String) {
     Menu("menu"),
     Start("start"),
+    Category("category"),
     Word("word")
 }
 
@@ -20,6 +23,7 @@ enum class AppScreen(val route: String) {
 fun AppNavigation(
     navController: NavHostController,
     viewModel: MainViewModel,
+    categoryViewModel: CategoryViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -31,7 +35,10 @@ fun AppNavigation(
             MainMenu(navController)
         }
         composable(AppScreen.Start.route) {
-            QuestionScreen(viewModel,navController)
+            QuestionScreen(viewModel, categoryViewModel,navController)
+        }
+        composable(AppScreen.Category.route) {
+            CategorySelect(categoryViewModel,navController)
         }
         composable(AppScreen.Word.route) {
             WordAddingScreen(viewModel,navController)

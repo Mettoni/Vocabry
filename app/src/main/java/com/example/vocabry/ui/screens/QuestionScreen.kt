@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,22 +35,28 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.vocabry.ui.viewModel.MainViewModel
 import com.example.vocabry.R
+import com.example.vocabry.ui.viewModel.CategoryViewModel
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostController) {
+fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel, navHostController: NavHostController) {
     val guessedWord by viewModel.correctWord.collectAsState()
     val options by viewModel.options.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
+    val category by categoryViewModel.selectedCategory.collectAsState()
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val score by viewModel.score.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.generateNewQuestion()
+    LaunchedEffect(category) {
+        category?.let {
+            viewModel.generateNewQuestion(it)
+        }
+
     }
 
 
@@ -69,7 +75,7 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             IconButton(onClick = {navHostController.popBackStack()
                 viewModel.resetGame()}) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Späť"
                 )
             }
@@ -81,7 +87,9 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
             correctAnswers = if(score > 0) score/100 else 0,
             onRestart = {
                 viewModel.resetGame()
-                viewModel.generateNewQuestion()
+                category?.let{
+                    viewModel.generateNewQuestion(it)
+                }
             },
             onBackToMenu = {
                 viewModel.resetGame()
@@ -126,7 +134,10 @@ fun QuestionScreen(viewModel: MainViewModel, navHostController: NavHostControlle
                         if (isCorrect) {
                             viewModel.addScore(100)
                         }
-                        viewModel.generateNewQuestion()
+                        category?.let {
+                            viewModel.generateNewQuestion(it)
+                        }
+
                     },
                     modifier = Modifier.fillMaxWidth().padding(4.dp)
                 ) {
