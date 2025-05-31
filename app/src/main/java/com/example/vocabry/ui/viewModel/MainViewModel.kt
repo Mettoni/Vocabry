@@ -70,6 +70,23 @@ class MainViewModel (
         /*
         viewModelScope.launch {
             val allWords = getList()
+            val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
+            if(!unusedWords.isEmpty()) {
+                val correct = unusedWords.random()
+                val options = generateOptions(correct)
+
+                _correctWord.value = correct
+                _options.value = options
+                _alreadyUsed.value += correct
+            } else {
+                _gameFinished.value = true
+            }
+        }
+
+
+        /*
+        viewModelScope.launch {
+            val allWords = getList()
             if(allWords.size >= 4) {
                 val correct = allWords.random()
                 val options = generateOptions(correct)
