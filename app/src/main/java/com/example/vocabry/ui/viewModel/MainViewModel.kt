@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-
 class MainViewModel (
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
@@ -65,9 +64,6 @@ class MainViewModel (
                 _gameFinished.value = true
             }
         }
-
-
-        /*
         viewModelScope.launch {
             val allWords = getList()
             val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
@@ -82,20 +78,6 @@ class MainViewModel (
                 _gameFinished.value = true
             }
         }
-
-
-        /*
-        viewModelScope.launch {
-            val allWords = getList()
-            if(allWords.size >= 4) {
-                val correct = allWords.random()
-                val options = generateOptions(correct)
-
-                _correctWord.value = correct
-                _options.value = options
-            }
-        }
-         */
     }
     fun resetGame() {
         _alreadyUsed.value = emptyList()
@@ -112,5 +94,4 @@ class MainViewModel (
     fun addScore(score:Int) {
         _score.value += score
     }
-
 }

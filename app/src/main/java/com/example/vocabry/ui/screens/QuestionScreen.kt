@@ -13,9 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -23,6 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +40,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.vocabry.ui.viewModel.MainViewModel
 import com.example.vocabry.R
+import com.example.vocabry.domain.Word
 import com.example.vocabry.ui.viewModel.CategoryViewModel
+import kotlinx.coroutines.delay
 
 
 
@@ -69,8 +76,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     TopAppBar(
         title = { Text("Otázka")},
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
-            titleContentColor = Color.Black,
-            navigationIconContentColor = Color.Black),
+            titleContentColor = Color.Black, navigationIconContentColor = Color.Black),
         navigationIcon = {
             IconButton(onClick = {navHostController.popBackStack()
                 viewModel.resetGame()}) {
@@ -128,20 +134,15 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
                 val word = options.getOrNull(i) ?: continue
                 //val translation = translator.translateBlocking(word, Language.ENGLISH, Language.SLOVAK)
 
-                val isCorrect = word == guessedWord
-                Button(
-                    onClick = {
-                        if (isCorrect) {
-                            viewModel.addScore(100)
-                        }
-                        category?.let {
-                            viewModel.generateNewQuestion(it)
-                        }
-
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(4.dp)
-                ) {
-                    Text(text = word.translated)
+                //val isCorrect = word == guessedWord
+                //var clicked by remember { mutableSetOf(false)}
+                category?.let {
+                    BetterButtons(
+                        word = word,
+                        isCorrect = word == guessedWord,
+                        category = it,
+                        viewModel = viewModel
+                    )
                 }
             }
         }
@@ -175,5 +176,48 @@ fun EndGame(
         Button(onClick = onBackToMenu, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             Text("Späť do menu")
         }
+    }
+}
+
+@Composable
+fun BetterButtons(
+    word: Word,
+    isCorrect: Boolean,
+    category: String,
+    viewModel: MainViewModel
+) {
+    var clicked by remember { mutableStateOf(false) }
+    var showColor by remember { mutableStateOf(false) }
+    var triggerNext by remember { mutableStateOf(false) }
+
+    val buttonColor = when {
+        !clicked -> MaterialTheme.colorScheme.primary
+        isCorrect -> Color.Green
+        else -> Color.Red
+    }
+
+    if (triggerNext) {
+        LaunchedEffect(Unit) {
+            delay(500)
+            clicked = false
+            showColor = false
+            viewModel.generateNewQuestion(category)
+            triggerNext = false
+        }
+    }
+
+    Button(
+        onClick = {
+            if (!clicked) {
+                clicked = true
+                showColor = true
+                if (isCorrect) viewModel.addScore(100)
+                triggerNext = true
+            }
+        },
+        modifier = Modifier.fillMaxWidth().padding(4.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+    ) {
+        Text(text = word.translated)
     }
 }

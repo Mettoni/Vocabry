@@ -11,9 +11,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
@@ -22,6 +25,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -37,17 +43,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.vocabry.R
+import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostController) {
+fun WordAddingScreen(viewModel: MainViewModel,
+                     categoryViewModel: CategoryViewModel,
+                     navHostController: NavHostController) {
     var wordInput by remember { mutableStateOf("") }
     var translationInput by remember { mutableStateOf("") }
     var categoryInput by remember { mutableStateOf("") }
     var isAddingMode by remember { mutableStateOf(true) }
 
     val words by viewModel.wordList.collectAsState()
+    val categories by categoryViewModel.categories.collectAsState()
+
+    LaunchedEffect(Unit) {
+        categoryViewModel.loadCategories()
+    }
 
     TopAppBar(
         title = { Text("") },
@@ -59,7 +73,7 @@ fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostControl
         navigationIcon = {
             IconButton(onClick = { navHostController.popBackStack() }) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Späť"
                 )
             }
@@ -99,20 +113,16 @@ fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostControl
             onValueChanged = { translationInput = it },
             modifier = Modifier.fillMaxWidth()
         )
-        EditTextField(
-            label = "Kategória",
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            ),
-            value = categoryInput,
-            onValueChanged = { categoryInput = it },
-            modifier = Modifier.fillMaxWidth()
+        CategoryDropdownWithInput(
+            categories = categories,
+            selectedCategory = categoryInput,
+            onCategoryChanged = { categoryInput = it
+            }
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp,start = if(isLandscape) 600.dp else 100.dp)
         ) {
             Text(
                 text = if (isAddingMode) "Pridávanie slova" else "Odoberanie slova",
@@ -150,6 +160,70 @@ fun WordAddingScreen(viewModel: MainViewModel, navHostController: NavHostControl
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryDropdownWithInput(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategoryChanged: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var localInput by remember { mutableStateOf(selectedCategory) }
+    var filteredCategories by remember { mutableStateOf(categories) }
+
+    LaunchedEffect(localInput, categories) {
+        filteredCategories = categories.filter {
+            it.contains(localInput, ignoreCase = true)
+        }
+    }
+
+    val focusRequester = remember { FocusRequester() }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                value = localInput,
+                onValueChange = {
+                    localInput = it
+                    expanded = true
+                    onCategoryChanged(it)
+                },
+                label = { Text("Kategória") },
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.textFieldColors()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                filteredCategories.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            localInput = option
+                            expanded = false
+                            onCategoryChanged(option)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+
 
 @Composable
 fun EditTextField(

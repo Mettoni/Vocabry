@@ -41,7 +41,7 @@ fun AppNavigation(
             CategorySelect(categoryViewModel,navController)
         }
         composable(AppScreen.Word.route) {
-            WordAddingScreen(viewModel,navController)
+            WordAddingScreen(viewModel,categoryViewModel,navController)
         }
     }
 
