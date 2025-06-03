@@ -22,15 +22,19 @@ class CategoryViewModel(
     private val _words = MutableStateFlow<List<Word>>(emptyList())
     val words: StateFlow<List<Word>> = _words
 
-    fun loadCategories() {
+    private val _selectedLanguage = MutableStateFlow("English")
+    val selectedLanguage: StateFlow<String> = _selectedLanguage
+
+    fun loadCategories(language: String) {
         viewModelScope.launch {
             _categories.value = getCategories()
         }
     }
-    fun selectedCategory(category: String) {
-        _selectedCategory.value = category
+    fun selectedCategory(category: String, language: String) {
         viewModelScope.launch {
-            _words.value = getWordsByCategory(category)
+            _words.value = getWordsByCategory(category, language)
+            _selectedCategory.value = category
+            _selectedLanguage.value = language
         }
     }
 }

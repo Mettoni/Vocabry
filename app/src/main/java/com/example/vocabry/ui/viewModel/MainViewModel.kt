@@ -40,25 +40,25 @@ class MainViewModel (
     private val _gameFinished = MutableStateFlow(false)
     val gameFinished: StateFlow<Boolean> = _gameFinished
 
-    fun addWord(word: String,translation: String, category: String) {
+    fun addWord(word: String,translation: String, category: String,language:String) {
         viewModelScope.launch {
-            addWordUseCase(word,translation,category)
-            refreshWords()
+            addWordUseCase(word,translation,category,language)
+            refreshWords(language)
         }
     }
-    fun removeWord(word:String,category: String) {
+    fun removeWord(word:String,category: String,language:String) {
         viewModelScope.launch {
-            removeWordUseCase(word,category)
-            refreshWords()
+            removeWordUseCase(word,category,language)
+            loadWordsByCategory(category,language)
         }
     }
-    fun generateNewQuestion(category: String) {
+    fun generateNewQuestion(category: String,language:String) {
         viewModelScope.launch {
-            val allWords = getWordsByCategory(category)
+            val allWords = getWordsByCategory(category,language)
             val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
             if(!unusedWords.isEmpty()) {
                 val correct = unusedWords.random()
-                val options = generateOptions(correct)
+                val options = generateOptions(correct,language)
 
                 _correctWord.value = correct
                 _options.value = options
@@ -68,15 +68,15 @@ class MainViewModel (
             }
         }
     }
-    fun loadWordsByCategory(category: String){
+    fun loadWordsByCategory(category: String,language:String){
         viewModelScope.launch {
-            _wordList.value = getWordsByCategory(category)
+            _wordList.value = getWordsByCategory(category,language)
         }
     }
 
-    fun checkIfWordExists(word: String, category: String, onResult: (Boolean) -> Unit) {
+    fun checkIfWordExists(word: String, category: String,language:String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val wordsInCategory = getWordsByCategory(category)
+            val wordsInCategory = getWordsByCategory(category,language)
             val exists = wordsInCategory.any {
                 it.word.equals(word.trim(), ignoreCase = true)
             }
@@ -91,9 +91,9 @@ class MainViewModel (
         _options.value = emptyList()
         _gameFinished.value = false
     }
-    fun refreshWords() {
+    fun refreshWords(language:String) {
         viewModelScope.launch {
-            _wordList.value = getList()
+            _wordList.value = getList(language)
         }
     }
     fun addScore(score:Int) {

@@ -4,7 +4,7 @@ import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.WordFunctions
 
 class GenerateButtonOptions(private val wordLis: WordFunctions) {
-    suspend operator fun invoke(correctWord:Word): List<Word> {
-        return wordLis.getButtonOptions(correctWord)
+    suspend operator fun invoke(correctWord:Word,language:String): List<Word> {
+        return wordLis.getButtonOptions(correctWord,language)
     }
 }

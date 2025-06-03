@@ -38,21 +38,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.vocabry.ui.viewModel.MainViewModel
 import com.example.vocabry.R
 import com.example.vocabry.domain.Word
 import com.example.vocabry.ui.viewModel.CategoryViewModel
+import com.example.vocabry.ui.viewModel.LanguageViewModel
+import com.example.vocabry.ui.viewModel.MainViewModel
 import kotlinx.coroutines.delay
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel, navHostController: NavHostController) {
+fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel,languageViewModel: LanguageViewModel, navHostController: NavHostController) {
     val guessedWord by viewModel.correctWord.collectAsState()
     val options by viewModel.options.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val category by categoryViewModel.selectedCategory.collectAsState()
+    val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -61,7 +62,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
 
     LaunchedEffect(category) {
         category?.let {
-            viewModel.generateNewQuestion(it)
+            viewModel.generateNewQuestion(it,selectedLanguage)
         }
 
     }
@@ -91,7 +92,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
             onRestart = {
                 viewModel.resetGame()
                 category?.let{
-                    viewModel.generateNewQuestion(it)
+                    viewModel.generateNewQuestion(it,selectedLanguage)
                 }
             },
             onBackToMenu = {
@@ -107,40 +108,42 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
             fontFamily = poppins,
             modifier = Modifier.padding(top = 100.dp)
         )
+        if(guessedWord != null) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(
+                    start = 32.dp,
+                    end = 32.dp,
+                    top = if (isLandscape) 80.dp else 32.dp
+                ),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Ako sa povie po anglicky: ${guessedWord?.word}",
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = poppins,
+                    modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+                        .padding(8.dp)
+                )
 
-        Column(
-            modifier = Modifier.fillMaxSize().padding(
-                start = 32.dp,
-                end = 32.dp,
-                top = if (isLandscape) 80.dp else 32.dp
-            ),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Ako sa povie po anglicky: ${guessedWord?.word}",
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center,
-                fontFamily = poppins,
-                modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
-                    .padding(8.dp)
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                for (i in 0..3) {
+                    val word = options.getOrNull(i) ?: continue
+                    category?.let { cat ->
+                        guessedWord?.let { correct ->
+                            BetterButtons(
+                                word = word,
+                                isCorrect = word == correct,
+                                category = cat,
+                                correctWord = correct,
+                                language = selectedLanguage,
+                                viewModel = viewModel
+                            )
+                        }
 
-            for (i in 0..3) {
-                val word = options.getOrNull(i) ?: continue
-                category?.let { cat ->
-                    guessedWord?.let{ correct->
-                        BetterButtons(
-                            word = word,
-                            isCorrect = word == correct,
-                            category = cat,
-                            correctWord = correct,
-                            viewModel = viewModel
-                        )
                     }
-
                 }
             }
         }
@@ -183,6 +186,7 @@ fun BetterButtons(
     isCorrect: Boolean,
     correctWord: Word,
     category: String,
+    language:String,
     viewModel: MainViewModel
 ) {
     var clicked by remember { mutableStateOf(false) }
@@ -200,7 +204,7 @@ fun BetterButtons(
             delay(500)
             clicked = false
             showColor = false
-            viewModel.generateNewQuestion(category)
+            viewModel.generateNewQuestion(category,language)
             triggerNext = false
         }
     }
@@ -214,9 +218,9 @@ fun BetterButtons(
                     viewModel.addScore(100)
                     triggerNext = true
                 } else {
-                    viewModel.checkIfWordExists(correctWord.word, "Chyby") { exists ->
+                    viewModel.checkIfWordExists(correctWord.word, "Chyby",language) { exists ->
                         if (!exists) {
-                            viewModel.addWord(correctWord.word, correctWord.translated, "Chyby")
+                            viewModel.addWord(correctWord.word, correctWord.translated, "Chyby",language)
                         }
                         triggerNext = true
                     }

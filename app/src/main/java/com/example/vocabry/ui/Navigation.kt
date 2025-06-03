@@ -2,20 +2,23 @@ package com.example.vocabry.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.vocabry.ui.screens.MainMenu
-import com.example.vocabry.ui.viewModel.MainViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.vocabry.ui.screens.CategorySelect
+import com.example.vocabry.ui.screens.LanguageSelectScreen
+import com.example.vocabry.ui.screens.MainMenu
 import com.example.vocabry.ui.screens.QuestionScreen
 import com.example.vocabry.ui.screens.WordAddingScreen
 import com.example.vocabry.ui.viewModel.CategoryViewModel
+import com.example.vocabry.ui.viewModel.LanguageViewModel
+import com.example.vocabry.ui.viewModel.MainViewModel
 
 enum class AppScreen(val route: String) {
     Menu("menu"),
     Start("start"),
     Category("category"),
+    Language("language"),
     Word("word")
 }
 
@@ -24,6 +27,7 @@ fun AppNavigation(
     navController: NavHostController,
     viewModel: MainViewModel,
     categoryViewModel: CategoryViewModel,
+    languageViewModel: LanguageViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -35,13 +39,16 @@ fun AppNavigation(
             MainMenu(navController)
         }
         composable(AppScreen.Start.route) {
-            QuestionScreen(viewModel, categoryViewModel,navController)
+            QuestionScreen(viewModel, categoryViewModel,languageViewModel,navController)
         }
         composable(AppScreen.Category.route) {
-            CategorySelect(categoryViewModel,navController)
+            CategorySelect(categoryViewModel,languageViewModel,navController)
+        }
+        composable(AppScreen.Language.route) {
+            LanguageSelectScreen(languageViewModel,navController)
         }
         composable(AppScreen.Word.route) {
-            WordAddingScreen(viewModel,categoryViewModel,navController)
+            WordAddingScreen(viewModel,categoryViewModel,languageViewModel,navController)
         }
     }
 

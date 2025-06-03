@@ -3,14 +3,13 @@ package com.example.vocabry.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -18,22 +17,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewModel, navController: NavController) {
-    val categories by viewModel.categories.collectAsState()
-    val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
+fun LanguageSelectScreen(
+    viewModel: LanguageViewModel,
+    navController: NavController,
+) {
+    val selectedLanguage by viewModel.selectedLanguage.collectAsState()
+    val languages by viewModel.languages.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadCategories(selectedLanguage)
+        viewModel.loadLanguages()
     }
 
     TopAppBar(
@@ -51,28 +51,21 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
         }
     )
 
-    val scrollState = rememberScrollState()
+    Column(modifier = Modifier.padding(top = 90.dp,start = 10.dp)) {
+        Text("Vyber jazyk", style = MaterialTheme.typography.titleLarge)
 
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 32.dp, vertical = 16.dp)
-            .verticalScroll(scrollState)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Vyber kategóriu:", modifier = Modifier.padding(vertical = 24.dp))
 
-        categories.forEach { category ->
+        languages.forEach { lang: String ->
             Button(
                 onClick = {
-                    viewModel.selectedCategory(category,selectedLanguage)
-                    navController.navigate("start")
+                    viewModel.setLanguage(lang)
+                    navController.navigate("category")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .padding(3.dp)
             ) {
-                Text(text = category)
+                Text(lang)
             }
         }
     }

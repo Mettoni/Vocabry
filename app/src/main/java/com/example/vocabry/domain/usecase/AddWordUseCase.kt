@@ -5,7 +5,7 @@ import com.example.vocabry.domain.WordFunctions
 class AddWordUseCase(
     private val wordLis: WordFunctions
 ) {
-    suspend operator fun invoke(word: String,translation: String, category: String) {
-        wordLis.addWord(word,translation,category)
+    suspend operator fun invoke(word: String,translation: String, category: String,language:String) {
+        wordLis.addWord(word,translation,category,language)
     }
 }

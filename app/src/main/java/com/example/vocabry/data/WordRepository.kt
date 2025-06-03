@@ -6,35 +6,35 @@ import com.example.vocabry.domain.WordFunctions
 
 class WordRepository(private val dao: WordDao): WordFunctions {
 
-    override suspend fun getAllWords(): List<Word> {
-        return dao.getAllWords().map { it.toDomain() }
+    override suspend fun getAllWords(language:String): List<Word> {
+        return dao.getAllWords(language).map { it.toDomain() }
     }
 
-    override suspend fun addWord(word: String, translation: String, category: String) {
+    override suspend fun addWord(word: String, translation: String, category: String,language:String) {
         //wordList.add(word)
         //možno budem potrebovať withContext(Dispatchers.IO) keby aplikácie neresponduje
-        dao.insertWord(WordEntity(word = word, translated = translation, category = category))
+        dao.insertWord(WordEntity(word = word, translated = translation, category = category, language = language))
     }
 
-    override suspend fun removeWord(word: String, category: String) {
+    override suspend fun removeWord(word: String, category: String,language:String) {
         //wordList.remove(word)
         //možno budem potrebovať withContext(Dispatchers.IO) keby aplikácie neresponduje
-        dao.deleteWord(word,category)
+        dao.deleteWord(word,category,language)
     }
 
     override suspend fun getAllCategories(): List<String> {
         return dao.getAllCategories()
     }
 
-    override suspend fun getWordsByCategory(category: String): List<Word> {
-        return dao.getByCategory(category).map{it.toDomain()}
+    override suspend fun getWordsByCategory(category: String,language:String): List<Word> {
+        return dao.getByCategory(category,language).map{it.toDomain()}
     }
 
-    override suspend fun getButtonOptions(correctWord: Word): List<Word> {
+    override suspend fun getButtonOptions(correctWord: Word,language: String): List<Word> {
         val wordList = if(correctWord.category == "Chyby") {
-            dao.getAllWords().filter{it.word != correctWord.word}
+            dao.getAllWords(language).filter{it.word != correctWord.word}
         } else {
-            dao.getByCategory(correctWord.category).filter { it.word != correctWord.word }
+            dao.getByCategory(correctWord.category,language).filter { it.word != correctWord.word }
         }
         //
         val buttonList = mutableListOf<WordEntity>()
@@ -48,5 +48,9 @@ class WordRepository(private val dao: WordDao): WordFunctions {
             }
         }
         return buttonList.shuffled().map {it.toDomain()}
+    }
+
+    override suspend fun getAllLanguages(): List<String> {
+        return dao.getAllLanguages()
     }
 }

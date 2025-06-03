@@ -47,12 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
+import com.example.vocabry.ui.viewModel.LanguageViewModel
 import com.example.vocabry.ui.viewModel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordAddingScreen(viewModel: MainViewModel,
                      categoryViewModel: CategoryViewModel,
+                     languageViewModel: LanguageViewModel,
                      navHostController: NavHostController) {
     var wordInput by remember { mutableStateOf("") }
     var translationInput by remember { mutableStateOf("") }
@@ -61,8 +63,12 @@ fun WordAddingScreen(viewModel: MainViewModel,
     val words by viewModel.wordList.collectAsState()
     val categories by categoryViewModel.categories.collectAsState()
 
+    val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
+    val allLanguages by languageViewModel.languages.collectAsState()
+
     LaunchedEffect(Unit) {
-        categoryViewModel.loadCategories()
+        languageViewModel.loadLanguages()
+        categoryViewModel.loadCategories(selectedLanguage)
     }
 
     TopAppBar(
@@ -115,19 +121,30 @@ fun WordAddingScreen(viewModel: MainViewModel,
             onValueChanged = { translationInput = it },
             modifier = Modifier.fillMaxWidth()
         )
+
+        LanguageDropdownWithInput(
+            languages = allLanguages,
+            selectedLanguage = selectedLanguage,
+            onLanguageChanged = {
+                languageViewModel.setLanguage(it)
+                categoryViewModel.loadCategories(it)
+                viewModel.loadWordsByCategory(categoryInput, it)
+            }
+        )
+
         CategoryDropdownWithInput(
             categories = categories,
             selectedCategory = categoryInput,
             onCategoryChanged = {
                 categoryInput = it
-                viewModel.loadWordsByCategory(it)
+                viewModel.loadWordsByCategory(it,selectedLanguage)
             }
         )
 
         Button(
             onClick = {
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
-                    viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim())
+                    viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim(),selectedLanguage.trim())
                     wordInput = ""
                     translationInput = ""
                     categoryInput = ""
@@ -159,7 +176,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = {
-                    viewModel.removeWord(word.word, word.category)
+                    viewModel.removeWord(word.word, word.category,selectedLanguage)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -232,8 +249,63 @@ fun CategoryDropdownWithInput(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LanguageDropdownWithInput(
+    languages: List<String>,
+    selectedLanguage: String,
+    onLanguageChanged: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var localInput by remember { mutableStateOf(selectedLanguage) }
+    var filteredLanguages by remember { mutableStateOf(languages) }
 
+    LaunchedEffect(localInput, languages) {
+        filteredLanguages = languages.filter {
+            it.contains(localInput, ignoreCase = true)
+        }
+    }
 
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                value = localInput,
+                onValueChange = {
+                    localInput = it
+                    expanded = true
+                    onLanguageChanged(it)
+                },
+                label = { Text("Jazyk") },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                },
+                colors = ExposedDropdownMenuDefaults.textFieldColors()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                filteredLanguages.forEach { language ->
+                    DropdownMenuItem(
+                        text = { Text(language) },
+                        onClick = {
+                            localInput = language
+                            expanded = false
+                            onLanguageChanged(language)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun EditTextField(

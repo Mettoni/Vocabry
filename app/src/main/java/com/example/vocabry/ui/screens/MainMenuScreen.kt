@@ -26,7 +26,7 @@ fun MainMenu(navController: NavController) {
     ) {
         Button(
             onClick = {
-                navController.navigate(AppScreen.Category.route)
+                navController.navigate(AppScreen.Language.route)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
