@@ -66,12 +66,9 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
 
     }
 
-
     val poppins = FontFamily(
         Font(R.font.poppins)
     )
-
-    //val translator = Translator()
 
     TopAppBar(
         title = { Text("Otázka")},
@@ -132,15 +129,12 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
 
             for (i in 0..3) {
                 val word = options.getOrNull(i) ?: continue
-                //val translation = translator.translateBlocking(word, Language.ENGLISH, Language.SLOVAK)
-
-                //val isCorrect = word == guessedWord
-                //var clicked by remember { mutableSetOf(false)}
                 category?.let {
                     BetterButtons(
                         word = word,
                         isCorrect = word == guessedWord,
                         category = it,
+                        correctWord = guessedWord !!,
                         viewModel = viewModel
                     )
                 }
@@ -183,6 +177,7 @@ fun EndGame(
 fun BetterButtons(
     word: Word,
     isCorrect: Boolean,
+    correctWord: Word,
     category: String,
     viewModel: MainViewModel
 ) {
@@ -211,8 +206,18 @@ fun BetterButtons(
             if (!clicked) {
                 clicked = true
                 showColor = true
-                if (isCorrect) viewModel.addScore(100)
-                triggerNext = true
+                if (isCorrect) {
+                    viewModel.addScore(100)
+                    triggerNext = true
+                } else {
+                    viewModel.checkIfWordExists(correctWord.word, "Chyby") { exists ->
+                        if (!exists) {
+                            viewModel.addWord(correctWord.word, correctWord.translated, "Chyby")
+                        }
+                        triggerNext = true
+                    }
+                }
+
             }
         },
         modifier = Modifier.fillMaxWidth().padding(4.dp),

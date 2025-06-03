@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class MainViewModel (
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
-    private val categoryWords:GetWordsByCategoryUseCase,
+    private val getWordsByCategory:GetWordsByCategoryUseCase,
     private val getList: GetListUseCase,
     private val generateOptions: GenerateButtonOptions,
 ): ViewModel() {
@@ -51,21 +51,7 @@ class MainViewModel (
     }
     fun generateNewQuestion(category: String) {
         viewModelScope.launch {
-            val allWords = categoryWords(category)
-            val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
-            if(!unusedWords.isEmpty()) {
-                val correct = unusedWords.random()
-                val options = generateOptions(correct)
-
-                _correctWord.value = correct
-                _options.value = options
-                _alreadyUsed.value += correct
-            } else {
-                _gameFinished.value = true
-            }
-        }
-        viewModelScope.launch {
-            val allWords = getList()
+            val allWords = getWordsByCategory(category)
             val unusedWords = allWords.filterNot{used->_alreadyUsed.value.any{ it.word == used.word }}
             if(!unusedWords.isEmpty()) {
                 val correct = unusedWords.random()
@@ -79,6 +65,17 @@ class MainViewModel (
             }
         }
     }
+
+    fun checkIfWordExists(word: String, category: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val wordsInCategory = getWordsByCategory(category)
+            val exists = wordsInCategory.any {
+                it.word.equals(word.trim(), ignoreCase = true)
+            }
+            onResult(exists)
+        }
+    }
+
     fun resetGame() {
         _alreadyUsed.value = emptyList()
         _score.value = 0

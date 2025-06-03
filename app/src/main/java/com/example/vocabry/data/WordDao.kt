@@ -13,8 +13,8 @@ interface WordDao {
     @Query("SELECT DISTINCT category FROM words")
     suspend fun getAllCategories(): List<String>
 
-    @Query("SELECT * from words where category = :type")
-    suspend fun getByCategory(type: String): List<WordEntity>
+    @Query("SELECT * from words where category = :category")
+    suspend fun getByCategory(category: String): List<WordEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWord(word: WordEntity)
