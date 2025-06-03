@@ -16,7 +16,7 @@ abstract class WordDatabase: RoomDatabase() {
 
         fun getDatabase(context:Context): WordDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, WordDatabase::class.java,"WordsVAMZ.db").createFromAsset("WordsVAMZ.db").build().also{Instance=it}
+                Room.databaseBuilder(context, WordDatabase::class.java,"WordsDatabase.db").createFromAsset("WordsDatabase.db").build().also{Instance=it}
 
             }
         }

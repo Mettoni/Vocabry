@@ -3,6 +3,8 @@ package com.example.vocabry.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -47,18 +49,26 @@ fun CategorySelect(viewModel: CategoryViewModel, navController: NavController) {
         }
     )
 
+    val scrollState = rememberScrollState()
+
     Column(
-        modifier = Modifier.fillMaxWidth().padding(32.dp),
+        modifier = Modifier
+            .padding(horizontal = 32.dp, vertical = 16.dp)
+            .verticalScroll(scrollState)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Vyber kategóriu:",modifier = Modifier.padding(top = 50.dp))
+        Text("Vyber kategóriu:", modifier = Modifier.padding(vertical = 24.dp))
+
         categories.forEach { category ->
             Button(
                 onClick = {
                     viewModel.selectedCategory(category)
                     navController.navigate("start")
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
             ) {
                 Text(text = category)
             }

@@ -4,7 +4,9 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,7 +22,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Switch
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -54,7 +57,6 @@ fun WordAddingScreen(viewModel: MainViewModel,
     var wordInput by remember { mutableStateOf("") }
     var translationInput by remember { mutableStateOf("") }
     var categoryInput by remember { mutableStateOf("") }
-    var isAddingMode by remember { mutableStateOf(true) }
 
     val words by viewModel.wordList.collectAsState()
     val categories by categoryViewModel.categories.collectAsState()
@@ -116,32 +118,16 @@ fun WordAddingScreen(viewModel: MainViewModel,
         CategoryDropdownWithInput(
             categories = categories,
             selectedCategory = categoryInput,
-            onCategoryChanged = { categoryInput = it
+            onCategoryChanged = {
+                categoryInput = it
+                viewModel.loadWordsByCategory(it)
             }
         )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 16.dp,start = if(isLandscape) 600.dp else 100.dp)
-        ) {
-            Text(
-                text = if (isAddingMode) "Pridávanie slova" else "Odoberanie slova",
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Switch(
-                checked = isAddingMode,
-                onCheckedChange = { isAddingMode = it }
-            )
-        }
 
         Button(
             onClick = {
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
-                    if (isAddingMode) {
-                        viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim())
-                    } else {
-                        viewModel.removeWord(wordInput.trim(), categoryInput.trim())
-                    }
+                    viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim())
                     wordInput = ""
                     translationInput = ""
                     categoryInput = ""
@@ -154,9 +140,33 @@ fun WordAddingScreen(viewModel: MainViewModel,
             Text(stringResource(R.string.potvrdit))
         }
 
-        Text("Zoznam slov:", modifier = Modifier.padding(top = 16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text("Zoznam slov v kategórii:", style = MaterialTheme.typography.titleMedium)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         words.forEach { word ->
-            Text(text = "• ${word.word} – ${word.translated} [${word.category}]")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "${word.word} – ${word.translated}",
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = {
+                    viewModel.removeWord(word.word, word.category)
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Odstrániť slovo"
+                    )
+                }
+            }
         }
     }
 }

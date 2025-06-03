@@ -6,6 +6,7 @@ import com.example.vocabry.domain.usecase.AddWordUseCase
 import com.example.vocabry.domain.usecase.GenerateButtonOptions
 import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
+import com.example.vocabry.domain.usecase.NotificationUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
 
 class MainViewModelFactory(
@@ -14,6 +15,7 @@ class MainViewModelFactory(
     private val getAllWords: GetListUseCase,
     private val generateButtons: GenerateButtonOptions,
     private val getWordsByCategoryUseCase: GetWordsByCategoryUseCase,
+    private val notifyUserUseCase: NotificationUseCase
 ): ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -24,6 +26,7 @@ class MainViewModelFactory(
                 getWordsByCategoryUseCase,
                 getAllWords,
                 generateButtons,
+                notifyUserUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

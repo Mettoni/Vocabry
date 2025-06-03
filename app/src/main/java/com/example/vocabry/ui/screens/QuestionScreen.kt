@@ -103,7 +103,8 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     } else {
         Text(
             text = "Skóre: $score",
-            fontSize = 15.sp,
+            fontSize = 20.sp,
+            fontFamily = poppins,
             modifier = Modifier.padding(top = 100.dp)
         )
 
@@ -129,14 +130,17 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
 
             for (i in 0..3) {
                 val word = options.getOrNull(i) ?: continue
-                category?.let {
-                    BetterButtons(
-                        word = word,
-                        isCorrect = word == guessedWord,
-                        category = it,
-                        correctWord = guessedWord !!,
-                        viewModel = viewModel
-                    )
+                category?.let { cat ->
+                    guessedWord?.let{ correct->
+                        BetterButtons(
+                            word = word,
+                            isCorrect = word == correct,
+                            category = cat,
+                            correctWord = correct,
+                            viewModel = viewModel
+                        )
+                    }
+
                 }
             }
         }

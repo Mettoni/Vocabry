@@ -3,9 +3,10 @@ package com.example.vocabry.data
 import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.WordFunctions
 
+
 class WordRepository(private val dao: WordDao): WordFunctions {
 
-    override suspend fun getAllWords(): List<Word> { //= wordList
+    override suspend fun getAllWords(): List<Word> {
         return dao.getAllWords().map { it.toDomain() }
     }
 
@@ -30,7 +31,12 @@ class WordRepository(private val dao: WordDao): WordFunctions {
     }
 
     override suspend fun getButtonOptions(correctWord: Word): List<Word> {
-        val wordList = dao.getAllWords().filter{it.word != correctWord.word}
+        val wordList = if(correctWord.category == "Chyby") {
+            dao.getAllWords().filter{it.word != correctWord.word}
+        } else {
+            dao.getByCategory(correctWord.category).filter { it.word != correctWord.word }
+        }
+        //
         val buttonList = mutableListOf<WordEntity>()
         buttonList.clear()
         buttonList.add(correctWord.toEntity())
