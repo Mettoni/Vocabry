@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -70,6 +71,13 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     val poppins = FontFamily(
         Font(R.font.poppins)
     )
+
+    val languageText = when (selectedLanguage.lowercase()) {
+        "english","en"->"anglicky"
+        "german","ge"->"nemecky"
+        "russian","ru"->"rusky"
+        else -> selectedLanguage
+    }
 
     TopAppBar(
         title = { Text("Otázka")},
@@ -110,20 +118,23 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
         )
         if(guessedWord != null) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(
-                    start = 32.dp,
-                    end = 32.dp,
-                    top = if (isLandscape) 80.dp else 32.dp
-                ),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = 32.dp,
+                        end = 32.dp,
+                        top = if (isLandscape) 80.dp else 32.dp
+                    ),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Ako sa povie po anglicky: ${guessedWord?.word}",
+                    text = "Ako sa povie po $languageText: ${guessedWord?.word}",
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     fontFamily = poppins,
-                    modifier = Modifier.border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+                    modifier = Modifier
+                        .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
                         .padding(8.dp)
                 )
 
@@ -166,15 +177,19 @@ fun EndGame(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Tvoje finálne skóre je: $score\nSprávne odpovede: $correctAnswers",
+            text = stringResource(R.string.sprava_skore, score, correctAnswers),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 32.dp)
         )
-        Button(onClick = onRestart, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Button(onClick = onRestart, modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
             Text("Reštartovať")
         }
-        Button(onClick = onBackToMenu, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+        Button(onClick = onBackToMenu, modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
             Text("Späť do menu")
         }
     }
@@ -228,7 +243,9 @@ fun BetterButtons(
 
             }
         },
-        modifier = Modifier.fillMaxWidth().padding(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(text = word.translated)

@@ -21,8 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 
@@ -45,7 +47,7 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
             IconButton(onClick = {navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Späť"
+                    contentDescription = stringResource(R.string.spat)
                 )
             }
         }
@@ -60,7 +62,7 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Vyber kategóriu:", modifier = Modifier.padding(vertical = 24.dp))
+        Text(stringResource(R.string.vyber_katgoriu), modifier = Modifier.padding(vertical = 24.dp))
 
         categories.forEach { category ->
             Button(

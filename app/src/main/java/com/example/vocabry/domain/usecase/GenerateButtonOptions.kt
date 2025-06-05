@@ -3,8 +3,22 @@ package com.example.vocabry.domain.usecase
 import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.WordFunctions
 
-class GenerateButtonOptions(private val wordLis: WordFunctions) {
+/**
+ *  UseCase trieda zodpovedná za generovanie možností do tlačítok pod otázkou
+ *
+ *  Trieda implementuje operáciu, ktorá generuje možnosti na základe správneho slovíčka pomocou dát získaných cez rozhranie [WordFunctions]
+ *
+ *  @param repository Inštancia implementácie rozhrania [WordFunctions], ktorá zabezpečuje prístup do úložiska dát ako je napr. roomDao
+ */
+class GenerateButtonOptions(private val repository: WordFunctions) {
+    /**
+     *  Pridá nové slovíčko so zadaným prekladom,kategóriou a jazykom do databázy
+     *
+     *  @param correctWord Predstavuje hádané slovíčko
+     *  @param language Jazyk v ktorom majú byť slovíčka v tlačítkach
+     *  @return Slovíčka ktoré sa budú nachádzať v tlačítkach pod otázkou
+     */
     suspend operator fun invoke(correctWord:Word,language:String): List<Word> {
-        return wordLis.getButtonOptions(correctWord,language)
+        return repository.getButtonOptions(correctWord,language)
     }
 }

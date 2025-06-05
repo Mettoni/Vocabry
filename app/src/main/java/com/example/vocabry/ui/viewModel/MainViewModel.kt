@@ -14,6 +14,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel, ktorý sa zaoberá o správu slovíčok,skóre a generovanie otázok
+ *
+ * @author Filip Ďurana
+ * @param addWordUseCase UseCase na pridanie slovíčka
+ * @param removeWordUseCase UseCase na odobratie slovíčka
+ * @param getWordsByCategory UseCase ktorý vráti všetky slovíčka z vybranej kategórie
+ * @param getList UseCase na získanie všetkých slov
+ * @param generateOptions UseCase ktorý vygeneruje možnosti do tlačítok
+ * @param notifyUserUseCase UseCase na plánovanie notifikácií
+ */
 class MainViewModel (
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
@@ -40,18 +51,29 @@ class MainViewModel (
     private val _gameFinished = MutableStateFlow(false)
     val gameFinished: StateFlow<Boolean> = _gameFinished
 
+    /**
+     * Pridá slovíčko do databázy a obnoví zoznam
+     */
     fun addWord(word: String,translation: String, category: String,language:String) {
         viewModelScope.launch {
             addWordUseCase(word,translation,category,language)
             refreshWords(language)
         }
     }
+
+    /**
+     * Odstrani slovíčko zo zvolenej kategórie a jazyka
+     */
     fun removeWord(word:String,category: String,language:String) {
         viewModelScope.launch {
             removeWordUseCase(word,category,language)
             loadWordsByCategory(category,language)
         }
     }
+
+    /**
+     * Vygeneruje novú otázku (správne slovo a možnosti do tlačítok)
+     */
     fun generateNewQuestion(category: String,language:String) {
         viewModelScope.launch {
             val allWords = getWordsByCategory(category,language)
@@ -68,12 +90,19 @@ class MainViewModel (
             }
         }
     }
+
+    /**
+     *  Načíta slová pre danú kategóriu a jazyk
+     */
     fun loadWordsByCategory(category: String,language:String){
         viewModelScope.launch {
             _wordList.value = getWordsByCategory(category,language)
         }
     }
 
+    /**
+     *  Skontroluje, či dané slovo už existuje v kategórii a jazuyku
+     */
     fun checkIfWordExists(word: String, category: String,language:String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val wordsInCategory = getWordsByCategory(category,language)
@@ -84,6 +113,9 @@ class MainViewModel (
         }
     }
 
+    /**
+     *  Resetuje hru
+     */
     fun resetGame() {
         _alreadyUsed.value = emptyList()
         _score.value = 0
@@ -91,15 +123,26 @@ class MainViewModel (
         _options.value = emptyList()
         _gameFinished.value = false
     }
+
+    /**
+     * Obnoví zoznam slov pre daný jazyk
+     */
     fun refreshWords(language:String) {
         viewModelScope.launch {
             _wordList.value = getList(language)
         }
     }
+
+    /**
+     * Pridá skóre hráčovi
+     */
     fun addScore(score:Int) {
         _score.value += score
     }
 
+    /**
+     * Spustí naplánovanie dennej notifikácie
+     */
     fun scheduleNotification(context: Context) {
         notifyUserUseCase.invoke(context)
     }

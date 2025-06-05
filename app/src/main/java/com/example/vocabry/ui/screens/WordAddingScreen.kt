@@ -144,10 +144,25 @@ fun WordAddingScreen(viewModel: MainViewModel,
         Button(
             onClick = {
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
-                    viewModel.addWord(wordInput.trim(), translationInput.trim(), categoryInput.trim(),selectedLanguage.trim())
-                    wordInput = ""
-                    translationInput = ""
-                    categoryInput = ""
+                    viewModel.checkIfWordExists(
+                        word = wordInput.trim(),
+                        category = categoryInput.trim(),
+                        language = selectedLanguage.trim()
+                    ) { exists ->
+                        if (!exists) {
+                            viewModel.addWord(
+                                wordInput.trim(),
+                                translationInput.trim(),
+                                categoryInput.trim(),
+                                selectedLanguage.trim()
+                            )
+                            wordInput = ""
+                            translationInput = ""
+                            categoryInput = ""
+
+                            viewModel.loadWordsByCategory(categoryInput.trim(), selectedLanguage.trim())
+                        }
+                    }
                 }
             },
             modifier = Modifier
@@ -159,7 +174,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Zoznam slov v kategórii:", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.zoznam_slov_v_kateg), style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(8.dp))
 

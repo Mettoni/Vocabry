@@ -4,4 +4,8 @@
     <string name="potvrdit">Potvrdit</string>
     <string name="prid_vanie_slova">Pridávanie slova</string>
     <string name="odoberanie_slova">Odoberanie slova</string>
+    <string name="vyber_katgoriu">Vyber kategóriu:</string>
+    <string name="spat">Späť</string>
+    <string name="sprava_skore">Tvoje finálne skóre je: %1$s\nSprávne odpovede: %2$s</string>
+    <string name="zoznam_slov_v_kateg">Zoznam slov v kategórii:</string>
 </resources>
