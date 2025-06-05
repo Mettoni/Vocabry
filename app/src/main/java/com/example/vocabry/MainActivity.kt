@@ -19,7 +19,7 @@ import com.example.vocabry.data.WordDatabase
 import com.example.vocabry.data.WordRepository
 import com.example.vocabry.data.notification.NotificationScheduler
 import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GenerateButtonOptions
+import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
             AddWordUseCase(wordFunctions),
             RemoveWordUseCase(wordFunctions),
             GetListUseCase(wordFunctions),
-            GenerateButtonOptions(wordFunctions),
+            GetButtonOptionsUseCase(wordFunctions),
             GetWordsByCategoryUseCase(wordFunctions),
             notifyUserUseCase
         )

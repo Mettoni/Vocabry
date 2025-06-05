@@ -1,10 +1,14 @@
 package com.example.vocabry.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,7 +43,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,6 +77,15 @@ fun WordAddingScreen(viewModel: MainViewModel,
         categoryViewModel.loadCategories(selectedLanguage)
     }
 
+    Box(modifier = Modifier.background(Color(0xFF80B6F0)).fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+
     TopAppBar(
         title = { Text("") },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -94,7 +109,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(horizontal = 40.dp, vertical = if (isLandscape) 10.dp else 10.dp)
+            .padding(horizontal = if(isLandscape) 60.dp else 40.dp, vertical = if (isLandscape) 10.dp else 10.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

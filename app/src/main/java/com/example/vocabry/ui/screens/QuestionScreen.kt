@@ -1,8 +1,11 @@
 package com.example.vocabry.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +34,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -79,6 +84,17 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
         else -> selectedLanguage
     }
 
+    Box(modifier = Modifier
+        .background(Color(0xFF80B6F0))
+        .fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+
     TopAppBar(
         title = { Text("Otázka")},
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
@@ -111,7 +127,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
         )
     } else {
         Text(
-            text = "Skóre: $score",
+            text = stringResource(R.string.skore, score),
             fontSize = 20.sp,
             fontFamily = poppins,
             modifier = Modifier.padding(top = 100.dp)
@@ -134,7 +150,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
                     textAlign = TextAlign.Center,
                     fontFamily = poppins,
                     modifier = Modifier
-                        .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+                        .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp)).background(Color.White, shape = RoundedCornerShape(10.dp))
                         .padding(8.dp)
                 )
 
@@ -150,6 +166,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
                                 category = cat,
                                 correctWord = correct,
                                 language = selectedLanguage,
+                                isLandscape = isLandscape,
                                 viewModel = viewModel
                             )
                         }
@@ -185,12 +202,12 @@ fun EndGame(
         Button(onClick = onRestart, modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)) {
-            Text("Reštartovať")
+            Text(stringResource(R.string.restartovat))
         }
         Button(onClick = onBackToMenu, modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)) {
-            Text("Späť do menu")
+            Text(stringResource(R.string.spat_do_menu))
         }
     }
 }
@@ -202,11 +219,14 @@ fun BetterButtons(
     correctWord: Word,
     category: String,
     language:String,
+    isLandscape:Boolean,
     viewModel: MainViewModel
 ) {
     var clicked by remember { mutableStateOf(false) }
     var showColor by remember { mutableStateOf(false) }
     var triggerNext by remember { mutableStateOf(false) }
+
+    val buttonHeight = if(isLandscape) 40.dp else 60.dp
 
     val buttonColor = when {
         !clicked -> MaterialTheme.colorScheme.primary
@@ -245,7 +265,7 @@ fun BetterButtons(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
+            .padding(4.dp).height(buttonHeight),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(text = word.translated)

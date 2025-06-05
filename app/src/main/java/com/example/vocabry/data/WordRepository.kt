@@ -2,6 +2,8 @@ package com.example.vocabry.data
 
 import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.WordFunctions
+import kotlin.compareTo
+import kotlin.text.category
 
 
 class WordRepository(private val dao: WordDao): WordFunctions {
@@ -11,14 +13,10 @@ class WordRepository(private val dao: WordDao): WordFunctions {
     }
 
     override suspend fun addWord(word: String, translation: String, category: String,language:String) {
-        //wordList.add(word)
-        //možno budem potrebovať withContext(Dispatchers.IO) keby aplikácie neresponduje
         dao.insertWord(WordEntity(word = word, translated = translation, category = category, language = language))
     }
 
     override suspend fun removeWord(word: String, category: String,language:String) {
-        //wordList.remove(word)
-        //možno budem potrebovať withContext(Dispatchers.IO) keby aplikácie neresponduje
         dao.deleteWord(word,category,language)
     }
 
@@ -31,10 +29,11 @@ class WordRepository(private val dao: WordDao): WordFunctions {
     }
 
     override suspend fun getButtonOptions(correctWord: Word,language: String): List<Word> {
-        val wordList = if(correctWord.category == "Chyby") {
+        val categoryWords = dao.getByCategory(correctWord.category,language).filter { it.word != correctWord.word }
+        val wordList = if(correctWord.category == "Chyby"|| categoryWords.size < 3) {
             dao.getAllWords(language).filter{it.word != correctWord.word}
         } else {
-            dao.getByCategory(correctWord.category,language).filter { it.word != correctWord.word }
+            categoryWords
         }
         //
         val buttonList = mutableListOf<WordEntity>()

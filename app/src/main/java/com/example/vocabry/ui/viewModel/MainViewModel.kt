@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabry.domain.Word
 import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GenerateButtonOptions
+import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.NotificationUseCase
@@ -30,7 +30,7 @@ class MainViewModel (
     private val removeWordUseCase: RemoveWordUseCase,
     private val getWordsByCategory:GetWordsByCategoryUseCase,
     private val getList: GetListUseCase,
-    private val generateOptions: GenerateButtonOptions,
+    private val generateOptions: GetButtonOptionsUseCase,
     private val notifyUserUseCase: NotificationUseCase
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())

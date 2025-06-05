@@ -10,7 +10,7 @@ import com.example.vocabry.domain.WordFunctions
  *
  *  @param repository Inštancia implementácie rozhrania [WordFunctions], ktorá zabezpečuje prístup do úložiska dát ako je napr. roomDao
  */
-class GenerateButtonOptions(private val repository: WordFunctions) {
+class GetButtonOptionsUseCase(private val repository: WordFunctions) {
     /**
      *  Pridá nové slovíčko so zadaným prekladom,kategóriou a jazykom do databázy
      *

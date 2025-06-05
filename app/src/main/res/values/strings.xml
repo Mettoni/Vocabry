@@ -8,4 +8,11 @@
     <string name="spat">Späť</string>
     <string name="sprava_skore">Tvoje finálne skóre je: %1$s\nSprávne odpovede: %2$s</string>
     <string name="zoznam_slov_v_kateg">Zoznam slov v kategórii:</string>
+    <string name="exit">Exit</string>
+    <string name="words">Words</string>
+    <string name="start">Start</string>
+    <string name="skore">Skóre: %1$s</string>
+    <string name="restartovat">Reštartovať</string>
+    <string name="spat_do_menu">Späť do menu</string>
+    <string name="sp">spät</string>
 </resources>
