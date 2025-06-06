@@ -38,12 +38,12 @@ import com.example.vocabry.ui.viewModel.LanguageViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewModel, navController: NavController) {
-    val categories by viewModel.categories.collectAsState()
+fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navController: NavController) {
+    val categories by categoryViewModel.categories.collectAsState()
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadCategories(selectedLanguage)
+        categoryViewModel.loadCategories(selectedLanguage)
     }
 
     val scrollState = rememberScrollState()
@@ -86,7 +86,7 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
         categories.forEach { category ->
             Button(
                 onClick = dropUnlessResumed{
-                    viewModel.selectedCategory(category,selectedLanguage)
+                    categoryViewModel.selectedCategory(category,selectedLanguage)
                     navController.navigate("start")
                 },
                 modifier = Modifier

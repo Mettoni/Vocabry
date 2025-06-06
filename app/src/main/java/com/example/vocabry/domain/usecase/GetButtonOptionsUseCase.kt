@@ -1,7 +1,7 @@
 package com.example.vocabry.domain.usecase
 
-import com.example.vocabry.domain.Word
-import com.example.vocabry.domain.WordFunctions
+import com.example.vocabry.domain.model.Word
+import com.example.vocabry.domain.model.WordFunctions
 
 /**
  *  UseCase trieda zodpovedná za generovanie možností do tlačítok pod otázkou
@@ -11,8 +11,9 @@ import com.example.vocabry.domain.WordFunctions
  *  @param repository Inštancia implementácie rozhrania [WordFunctions], ktorá zabezpečuje prístup do úložiska dát ako je napr. roomDao
  */
 class GetButtonOptionsUseCase(private val repository: WordFunctions) {
+
     /**
-     *  Pridá nové slovíčko so zadaným prekladom,kategóriou a jazykom do databázy
+     *  Vytvorí možnosti možnosti do tlačítok
      *
      *  @param correctWord Predstavuje hádané slovíčko
      *  @param language Jazyk v ktorom majú byť slovíčka v tlačítkach

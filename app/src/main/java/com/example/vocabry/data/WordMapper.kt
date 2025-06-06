@@ -1,6 +1,6 @@
 package com.example.vocabry.data
 
-import com.example.vocabry.domain.Word
+import com.example.vocabry.domain.model.Word
 
 
 fun WordEntity.toDomain(): Word = Word(word_id,word,translated,category,language)

@@ -1,6 +1,6 @@
 package com.example.vocabry.domain.usecase
 
-import com.example.vocabry.domain.WordFunctions
+import com.example.vocabry.domain.model.WordFunctions
 
 /**
  *  UseCase trieda zodpovedná za pridanie nového slovíčka do databázy

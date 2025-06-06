@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,19 +56,19 @@ import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
-import com.example.vocabry.ui.viewModel.MainViewModel
+import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordAddingScreen(viewModel: MainViewModel,
+fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
                      categoryViewModel: CategoryViewModel,
                      languageViewModel: LanguageViewModel,
                      navHostController: NavHostController) {
-    var wordInput by remember { mutableStateOf("") }
-    var translationInput by remember { mutableStateOf("") }
-    var categoryInput by remember { mutableStateOf("") }
+    var wordInput by rememberSaveable { mutableStateOf("") }
+    var translationInput by rememberSaveable { mutableStateOf("") }
+    var categoryInput by rememberSaveable { mutableStateOf("") }
 
-    val words by viewModel.wordList.collectAsState()
+    val words by wordAddingScreenViewModel.wordList.collectAsState()
     val categories by categoryViewModel.categories.collectAsState()
 
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
@@ -144,7 +145,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
             onLanguageChanged = {
                 languageViewModel.setLanguage(it)
                 categoryViewModel.loadCategories(it)
-                viewModel.loadWordsByCategory(categoryInput, it)
+                wordAddingScreenViewModel.loadWordsByCategory(categoryInput, it)
             }
         )
 
@@ -153,20 +154,20 @@ fun WordAddingScreen(viewModel: MainViewModel,
             selectedCategory = categoryInput,
             onCategoryChanged = {
                 categoryInput = it
-                viewModel.loadWordsByCategory(it,selectedLanguage)
+                wordAddingScreenViewModel.loadWordsByCategory(it,selectedLanguage)
             }
         )
 
         Button(
             onClick = dropUnlessResumed{
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
-                    viewModel.checkIfWordExists(
+                    wordAddingScreenViewModel.checkIfWordExists(
                         word = wordInput.trim(),
                         category = categoryInput.trim(),
                         language = selectedLanguage.trim()
                     ) { exists ->
                         if (!exists) {
-                            viewModel.addWord(
+                            wordAddingScreenViewModel.addWord(
                                 wordInput.trim(),
                                 translationInput.trim(),
                                 categoryInput.trim(),
@@ -176,14 +177,14 @@ fun WordAddingScreen(viewModel: MainViewModel,
                             translationInput = ""
                             categoryInput = ""
 
-                            viewModel.loadWordsByCategory(categoryInput.trim(), selectedLanguage.trim())
+                            wordAddingScreenViewModel.loadWordsByCategory(categoryInput.trim(), selectedLanguage.trim())
                         }
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp).height(60.dp)
         ) {
             Text(stringResource(R.string.potvrdit))
         }
@@ -207,7 +208,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(onClick = dropUnlessResumed{
-                    viewModel.removeWord(word.word, word.category,selectedLanguage)
+                    wordAddingScreenViewModel.removeWord(word.word, word.category,selectedLanguage)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,

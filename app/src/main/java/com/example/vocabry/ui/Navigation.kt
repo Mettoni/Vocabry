@@ -12,7 +12,8 @@ import com.example.vocabry.ui.screens.QuestionScreen
 import com.example.vocabry.ui.screens.WordAddingScreen
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
-import com.example.vocabry.ui.viewModel.MainViewModel
+import com.example.vocabry.ui.viewModel.QuestionScreenViewModel
+import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
 
 enum class AppScreen(val route: String) {
     Menu("menu"),
@@ -25,9 +26,10 @@ enum class AppScreen(val route: String) {
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    viewModel: MainViewModel,
+    questionScreenViewModel: QuestionScreenViewModel,
     categoryViewModel: CategoryViewModel,
     languageViewModel: LanguageViewModel,
+    wordAddingScreenViewModel: WordAddingScreenViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -39,7 +41,7 @@ fun AppNavigation(
             MainMenu(navController)
         }
         composable(AppScreen.Start.route) {
-            QuestionScreen(viewModel, categoryViewModel,languageViewModel,navController)
+            QuestionScreen(questionScreenViewModel, categoryViewModel,languageViewModel,navController)
         }
         composable(AppScreen.Category.route) {
             CategorySelect(categoryViewModel,languageViewModel,navController)
@@ -48,7 +50,7 @@ fun AppNavigation(
             LanguageSelectScreen(languageViewModel,navController)
         }
         composable(AppScreen.Word.route) {
-            WordAddingScreen(viewModel,categoryViewModel,languageViewModel,navController)
+            WordAddingScreen(wordAddingScreenViewModel,categoryViewModel,languageViewModel,navController)
         }
     }
 

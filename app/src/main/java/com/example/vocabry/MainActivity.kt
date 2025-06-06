@@ -19,9 +19,9 @@ import com.example.vocabry.data.WordDatabase
 import com.example.vocabry.data.WordRepository
 import com.example.vocabry.data.notification.NotificationScheduler
 import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
+import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.NotificationUseCase
@@ -32,8 +32,10 @@ import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.CategoryViewModelFactory
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModelFactory
-import com.example.vocabry.ui.viewModel.MainViewModel
-import com.example.vocabry.ui.viewModel.MainViewModelFactory
+import com.example.vocabry.ui.viewModel.QuestionScreenViewModel
+import com.example.vocabry.ui.viewModel.QuestionScreenViewModelFactory
+import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
+import com.example.vocabry.ui.viewModel.WordAddingScreenViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
@@ -62,12 +64,11 @@ class MainActivity : ComponentActivity() {
         val wordFunctions = WordRepository(dao)
         val notifyUserUseCase = NotificationUseCase(NotificationScheduler())
 
-        val viewModelFactory = MainViewModelFactory(
+        val viewModelFactory = QuestionScreenViewModelFactory(
             AddWordUseCase(wordFunctions),
-            RemoveWordUseCase(wordFunctions),
+            GetWordsByCategoryUseCase(wordFunctions),
             GetListUseCase(wordFunctions),
             GetButtonOptionsUseCase(wordFunctions),
-            GetWordsByCategoryUseCase(wordFunctions),
             notifyUserUseCase
         )
         val categoryViewModelFactory = CategoryViewModelFactory(
@@ -79,21 +80,29 @@ class MainActivity : ComponentActivity() {
             GetAllLanguagesUseCase(wordFunctions)
         )
 
+        val wordAddingViewModelFactory = WordAddingScreenViewModelFactory(
+            AddWordUseCase(wordFunctions),
+            RemoveWordUseCase(wordFunctions),
+            GetWordsByCategoryUseCase(wordFunctions),
+            GetListUseCase(wordFunctions)
+        )
         enableEdgeToEdge()
         setContent {
             VocabryTheme {
                 val navController = rememberNavController()
-                val viewModel: MainViewModel = viewModel(factory = viewModelFactory)
+                val viewModel: QuestionScreenViewModel = viewModel(factory = viewModelFactory)
                 val categoryViewModel: CategoryViewModel = viewModel(factory = categoryViewModelFactory)
                 val languageViewModel: LanguageViewModel = viewModel(factory = languageViewModelFactory)
+                val wordAddingViewModel: WordAddingScreenViewModel = viewModel(factory = wordAddingViewModelFactory)
 
                 viewModel.scheduleNotification(applicationContext)
 
                 AppNavigation(
                     navController = navController,
-                    viewModel = viewModel,
+                    questionScreenViewModel = viewModel,
                     categoryViewModel = categoryViewModel,
                     languageViewModel = languageViewModel,
+                    wordAddingScreenViewModel = wordAddingViewModel,
                     modifier = Modifier
                 )
             }

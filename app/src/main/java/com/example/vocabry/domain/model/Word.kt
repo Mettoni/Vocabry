@@ -1,4 +1,4 @@
-package com.example.vocabry.domain
+package com.example.vocabry.domain.model
 
 /**
  * Dátová trieda reprezentujúca jedno slovíčko v aplikácii.
@@ -16,4 +16,3 @@ data class Word(
     val category: String,
     val language: String
 )
-

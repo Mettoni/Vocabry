@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,21 +47,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavHostController
 import com.example.vocabry.R
-import com.example.vocabry.domain.Word
+import com.example.vocabry.domain.model.Word
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
-import com.example.vocabry.ui.viewModel.MainViewModel
+import com.example.vocabry.ui.viewModel.QuestionScreenViewModel
 import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel,languageViewModel: LanguageViewModel, navHostController: NavHostController) {
+fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navHostController: NavHostController) {
     val guessedWord by viewModel.correctWord.collectAsState()
     val options by viewModel.options.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val category by categoryViewModel.selectedCategory.collectAsState()
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
+    val alreadyLoaded = rememberSaveable { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -68,9 +70,12 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     val score by viewModel.score.collectAsState()
     val numberOfQuestions by viewModel.questions.collectAsState()
     LaunchedEffect(category) {
-        category?.let {
-            viewModel.generateNewQuestion(it,selectedLanguage)
-            viewModel.numberOfQuestions(it,selectedLanguage)
+        if(!alreadyLoaded.value && category != null) {
+            category?.let {
+                viewModel.generateNewQuestion(it, selectedLanguage)
+                viewModel.numberOfQuestions(it, selectedLanguage)
+                alreadyLoaded.value = true
+            }
         }
 
     }
@@ -223,7 +228,7 @@ fun BetterButtons(
     category: String,
     language:String,
     isLandscape:Boolean,
-    viewModel: MainViewModel
+    viewModel: QuestionScreenViewModel
 ) {
     var clicked by remember { mutableStateOf(false) }
     var showColor by remember { mutableStateOf(false) }
@@ -248,18 +253,15 @@ fun BetterButtons(
     }
 
     Button(
-        onClick =dropUnlessResumed{
+        onClick = dropUnlessResumed{
             if (!clicked) {
                 clicked = true
                 showColor = true
                 if (isCorrect) {
-                    viewModel.addScore(100)
+                    viewModel.addScore(1)
                     triggerNext = true
                 } else {
-                    viewModel.checkIfWordExists(correctWord.word, "Chyby",language) { exists ->
-                        if (!exists) {
-                            viewModel.addWord(correctWord.word, correctWord.translated, "Chyby",language)
-                        }
+                    viewModel.checkIfWordExists(correctWord.word, correctWord.translated,"Chyby",language) {
                         triggerNext = true
                     }
                 }
@@ -268,8 +270,7 @@ fun BetterButtons(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
-            .height(buttonHeight),
+            .padding(4.dp).height(buttonHeight),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(text = word.translated)

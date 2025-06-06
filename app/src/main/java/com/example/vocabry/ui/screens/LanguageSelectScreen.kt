@@ -36,14 +36,14 @@ import com.example.vocabry.ui.viewModel.LanguageViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageSelectScreen(
-    viewModel: LanguageViewModel,
+    languageViewModel: LanguageViewModel,
     navController: NavController,
 ) {
-    val selectedLanguage by viewModel.selectedLanguage.collectAsState()
-    val languages by viewModel.languages.collectAsState()
+    val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
+    val languages by languageViewModel.languages.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadLanguages()
+        languageViewModel.loadLanguages()
     }
     Box(modifier = Modifier
         .background(Color(0xFF80B6F0))
@@ -78,7 +78,7 @@ fun LanguageSelectScreen(
         languages.forEach { lang: String ->
             Button(
                 onClick = dropUnlessResumed{
-                    viewModel.setLanguage(lang)
+                    languageViewModel.setLanguage(lang)
                     navController.navigate("category")
                 },
                 modifier = Modifier

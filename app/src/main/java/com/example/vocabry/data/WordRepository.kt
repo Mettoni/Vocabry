@@ -1,10 +1,7 @@
 package com.example.vocabry.data
 
-import com.example.vocabry.domain.Word
-import com.example.vocabry.domain.WordFunctions
-import kotlin.compareTo
-import kotlin.text.category
-
+import com.example.vocabry.domain.model.Word
+import com.example.vocabry.domain.model.WordFunctions
 
 class WordRepository(private val dao: WordDao): WordFunctions {
 

@@ -2,7 +2,7 @@ package com.example.vocabry.ui.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vocabry.domain.Word
+import com.example.vocabry.domain.model.Word
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
