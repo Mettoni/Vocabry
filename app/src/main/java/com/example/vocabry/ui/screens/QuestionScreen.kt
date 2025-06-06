@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.domain.Word
@@ -65,10 +66,11 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val score by viewModel.score.collectAsState()
-
+    val numberOfQuestions by viewModel.questions.collectAsState()
     LaunchedEffect(category) {
         category?.let {
             viewModel.generateNewQuestion(it,selectedLanguage)
+            viewModel.numberOfQuestions(it,selectedLanguage)
         }
 
     }
@@ -96,15 +98,15 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     }
 
     TopAppBar(
-        title = { Text("Otázka")},
+        title = { Text(stringResource(R.string.otazka))},
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
             titleContentColor = Color.Black, navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = {navHostController.popBackStack()
+            IconButton(onClick = dropUnlessResumed{navHostController.popBackStack()
                 viewModel.resetGame()}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Späť"
+                    contentDescription = stringResource(R.string.sp)
                 )
             }
         }
@@ -112,7 +114,7 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
     if(gameFinished) {
         EndGame(
             score = score,
-            correctAnswers = if(score > 0) score/100 else 0,
+            correctAnswers = numberOfQuestions,
             onRestart = {
                 viewModel.resetGame()
                 category?.let{
@@ -150,7 +152,8 @@ fun QuestionScreen(viewModel: MainViewModel,categoryViewModel: CategoryViewModel
                     textAlign = TextAlign.Center,
                     fontFamily = poppins,
                     modifier = Modifier
-                        .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp)).background(Color.White, shape = RoundedCornerShape(10.dp))
+                        .border(2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+                        .background(Color.White, shape = RoundedCornerShape(10.dp))
                         .padding(8.dp)
                 )
 
@@ -245,7 +248,7 @@ fun BetterButtons(
     }
 
     Button(
-        onClick = {
+        onClick =dropUnlessResumed{
             if (!clicked) {
                 clicked = true
                 showColor = true
@@ -265,7 +268,8 @@ fun BetterButtons(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp).height(buttonHeight),
+            .padding(4.dp)
+            .height(buttonHeight),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(text = word.translated)

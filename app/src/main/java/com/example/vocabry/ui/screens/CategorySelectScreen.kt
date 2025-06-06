@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
@@ -44,21 +45,6 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
     LaunchedEffect(Unit) {
         viewModel.loadCategories(selectedLanguage)
     }
-
-    TopAppBar(
-        title = { },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
-            titleContentColor = Color.Black,
-            navigationIconContentColor = Color.Black),
-        navigationIcon = {
-            IconButton(onClick = {navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.spat)
-                )
-            }
-        }
-    )
 
     val scrollState = rememberScrollState()
 
@@ -79,7 +65,7 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = {navController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.sp)
@@ -99,7 +85,7 @@ fun CategorySelect(viewModel: CategoryViewModel,languageViewModel: LanguageViewM
 
         categories.forEach { category ->
             Button(
-                onClick = {
+                onClick = dropUnlessResumed{
                     viewModel.selectedCategory(category,selectedLanguage)
                     navController.navigate("start")
                 },

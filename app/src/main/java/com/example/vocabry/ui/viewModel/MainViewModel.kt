@@ -43,13 +43,15 @@ class MainViewModel (
     val correctWord: StateFlow<Word?> = _correctWord
 
     private val _alreadyUsed = MutableStateFlow<List<Word>>(emptyList())
-    val alreadyUsed: StateFlow<List<Word>> = _alreadyUsed
 
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score
 
     private val _gameFinished = MutableStateFlow(false)
     val gameFinished: StateFlow<Boolean> = _gameFinished
+
+    private val _questions = MutableStateFlow(0)
+    val questions: StateFlow<Int> = _questions
 
     /**
      * Pridá slovíčko do databázy a obnoví zoznam
@@ -145,5 +147,12 @@ class MainViewModel (
      */
     fun scheduleNotification(context: Context) {
         notifyUserUseCase.invoke(context)
+    }
+
+    fun numberOfQuestions(category: String, language: String) {
+        viewModelScope.launch {
+            val words = getWordsByCategory(category,language)
+            _questions.value += words.size
+        }
     }
 }

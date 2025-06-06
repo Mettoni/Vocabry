@@ -26,7 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.LanguageViewModel
@@ -60,7 +62,7 @@ fun LanguageSelectScreen(
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = {navController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Späť"
@@ -70,18 +72,19 @@ fun LanguageSelectScreen(
     )
 
     Column(modifier = Modifier.padding(top = 90.dp,start = 10.dp)) {
-        Text("Vyber jazyk", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.vyber_jazyku), style = MaterialTheme.typography.titleLarge)
 
 
         languages.forEach { lang: String ->
             Button(
-                onClick = {
+                onClick = dropUnlessResumed{
                     viewModel.setLanguage(lang)
                     navController.navigate("category")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(3.dp).height(60.dp)
+                    .padding(3.dp)
+                    .height(60.dp)
             ) {
                 Text(lang)
             }

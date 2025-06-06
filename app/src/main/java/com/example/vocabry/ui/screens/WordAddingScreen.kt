@@ -50,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
@@ -94,7 +95,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
             navigationIconContentColor = Color.Black
         ),
         navigationIcon = {
-            IconButton(onClick = { navHostController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{ navHostController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Späť"
@@ -157,7 +158,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
         )
 
         Button(
-            onClick = {
+            onClick = dropUnlessResumed{
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
                     viewModel.checkIfWordExists(
                         word = wordInput.trim(),
@@ -205,7 +206,7 @@ fun WordAddingScreen(viewModel: MainViewModel,
                     text = "${word.word} – ${word.translated}",
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = {
+                IconButton(onClick = dropUnlessResumed{
                     viewModel.removeWord(word.word, word.category,selectedLanguage)
                 }) {
                     Icon(

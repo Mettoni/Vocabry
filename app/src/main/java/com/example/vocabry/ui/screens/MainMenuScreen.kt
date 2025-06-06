@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import com.example.vocabry.R
 import com.example.vocabry.ui.AppScreen
@@ -72,7 +73,7 @@ fun MainMenu(navHostController: NavController) {
     ) {
         Spacer(modifier = Modifier.height(if(isLandscape) 140.dp else 0.dp))
         Button(
-            onClick = {
+            onClick = dropUnlessResumed{
                 navHostController.navigate(AppScreen.Language.route)
             },
             modifier = Modifier.fillMaxWidth().height(60.dp)
@@ -81,7 +82,7 @@ fun MainMenu(navHostController: NavController) {
         }
         Spacer(modifier = Modifier.height(if(isLandscape) 5.dp else 10.dp))
         Button(
-            onClick = {
+            onClick = dropUnlessResumed {
                 navHostController.navigate(AppScreen.Word.route)
             },
             modifier = Modifier.fillMaxWidth().height(60.dp)
@@ -90,7 +91,7 @@ fun MainMenu(navHostController: NavController) {
         }
         Spacer(modifier = Modifier.height(if(isLandscape) 5.dp else 10.dp))
         Button(
-            onClick = {
+            onClick = dropUnlessResumed{
                 activity?.finish()
             },
             modifier = Modifier.fillMaxWidth().height(60.dp)

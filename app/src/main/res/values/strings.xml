@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TEST</string>
+    <string name="app_name">Vocabry</string>
     <string name="zadaj_slovo">Zadaj slovo</string>
     <string name="potvrdit">Potvrdit</string>
     <string name="prid_vanie_slova">Pridávanie slova</string>
@@ -15,4 +15,6 @@
     <string name="restartovat">Reštartovať</string>
     <string name="spat_do_menu">Späť do menu</string>
     <string name="sp">spät</string>
+    <string name="vyber_jazyku">Vyber jazyk</string>
+    <string name="otazka">Otázka</string>
 </resources>
