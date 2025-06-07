@@ -53,7 +53,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
 
     LaunchedEffect(Unit) {
-        categoryViewModel.loadCategories(selectedLanguage)
+        categoryViewModel.loadCategoriesByLanguage(selectedLanguage)
     }
 
     val scrollState = rememberScrollState()

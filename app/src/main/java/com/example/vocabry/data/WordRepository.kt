@@ -59,6 +59,16 @@ class WordRepository(private val dao: WordDao): WordFunctions {
     }
 
     /**
+     * Získa všetky dostupné kategórie v danom jazyku.
+     *
+     * @param language Jazyk v ktorom hladáme kategórie
+     * @return Zoznam názvov kategórií.
+     */
+    override suspend fun getAllCategoriesByLanguage(language: String): List<String> {
+        return dao.getAllCategoriesByLanguage(language)
+    }
+
+    /**
      * Získa všetky slovíčka z určitej kategórie a jazyka.
      *
      * @param category Kategória, podľa ktorej sa filtruje.

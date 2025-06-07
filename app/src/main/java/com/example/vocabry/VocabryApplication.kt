@@ -8,6 +8,7 @@ import com.example.vocabry.domain.usecase.AddWordUseCase
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
 import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
+import com.example.vocabry.domain.usecase.GetCategoriesByLanguageUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.NotificationUseCase
@@ -39,6 +40,8 @@ class VocabryApplication: Application() {
         private set
     lateinit var getAllCategoriesUseCase: GetAllCategoriesUseCase
         private set
+    lateinit var getCategoriesByLanguageUseCase: GetCategoriesByLanguageUseCase
+        private set
     lateinit var getAllLanguagesUseCase: GetAllLanguagesUseCase
         private set
     lateinit var getListUseCase: GetListUseCase
@@ -62,6 +65,7 @@ class VocabryApplication: Application() {
         addWordUseCase = AddWordUseCase(wordRepository)
         removeWordUseCase = RemoveWordUseCase(wordRepository)
         getAllCategoriesUseCase = GetAllCategoriesUseCase(wordRepository)
+        getCategoriesByLanguageUseCase = GetCategoriesByLanguageUseCase(wordRepository)
         getAllLanguagesUseCase = GetAllLanguagesUseCase(wordRepository)
         getListUseCase = GetListUseCase(wordRepository)
         getWordsByCategoryUseCase = GetWordsByCategoryUseCase(wordRepository)

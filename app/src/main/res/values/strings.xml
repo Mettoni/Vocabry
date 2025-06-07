@@ -25,4 +25,11 @@
     <string name="ge">ge</string>
     <string name="ru">ru</string>
     <string name="russian">russian</string>
+    <string name="preklad">Preklad</string>
+    <string name="slovo">Slovo</string>
+    <string name="odstr_ni_slovo">Odstrániť slovo</string>
+    <string name="zoznam_slov_v_kategorii">Zoznam slov v kategórii:</string>
+    <string name="kategoria">Kategória</string>
+    <string name="jazyk">Jazyk</string>
+    <string name="tvoje_fin_lne_sk_re_je">Tvoje finálne skóre je: %1$s / %2$s</string>
 </resources>

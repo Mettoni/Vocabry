@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
 
         val categoryVMFactory = CategoryViewModelFactory(
             app.getAllCategoriesUseCase,
+            app.getCategoriesByLanguageUseCase,
             app.getWordsByCategoryUseCase
         )
 

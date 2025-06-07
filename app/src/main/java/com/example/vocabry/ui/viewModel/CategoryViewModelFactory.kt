@@ -3,6 +3,7 @@ package com.example.vocabry.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
+import com.example.vocabry.domain.usecase.GetCategoriesByLanguageUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 
 /**
@@ -17,6 +18,7 @@ import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
  */
 class CategoryViewModelFactory(
     private val getAllCategoriesUseCase: GetAllCategoriesUseCase,
+    private val getCategoriesByLanguageUseCase: GetCategoriesByLanguageUseCase,
     private val getWordsByCategoryUseCase: GetWordsByCategoryUseCase
 ) : ViewModelProvider.Factory {
     /**
@@ -31,7 +33,8 @@ class CategoryViewModelFactory(
         if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
             return CategoryViewModel(
                 getAllCategoriesUseCase,
-                getWordsByCategoryUseCase
+                getWordsByCategoryUseCase,
+                getCategoriesByLanguageUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

@@ -57,6 +57,7 @@ import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
+
 /**
  * Obrazovka na pridávanie nových slov do databázy.
  *
@@ -71,10 +72,12 @@ import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
-                     categoryViewModel: CategoryViewModel,
-                     languageViewModel: LanguageViewModel,
-                     navHostController: NavHostController) {
+fun WordAddingScreen(
+    wordAddingScreenViewModel: WordAddingScreenViewModel,
+    categoryViewModel: CategoryViewModel,
+    languageViewModel: LanguageViewModel,
+    navHostController: NavHostController
+) {
     var wordInput by rememberSaveable { mutableStateOf("") }
     var translationInput by rememberSaveable { mutableStateOf("") }
     var categoryInput by rememberSaveable { mutableStateOf("") }
@@ -87,10 +90,16 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
 
     LaunchedEffect(Unit) {
         languageViewModel.loadLanguages()
-        categoryViewModel.loadCategories(selectedLanguage)
-    }
+        if (selectedLanguage.isBlank()) {
+            categoryViewModel.loadCategories()
+        } else {
+            categoryViewModel.loadCategoriesByLanguage(selectedLanguage)
+        }
 
-    Box(modifier = Modifier.background(Color(0xFF80B6F0)).fillMaxSize()) {
+    }
+    Box(modifier = Modifier
+        .background(Color(0xFF80B6F0))
+        .fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -107,10 +116,10 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
             navigationIconContentColor = Color.Black
         ),
         navigationIcon = {
-            IconButton(onClick = dropUnlessResumed{ navHostController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{ navHostController.navigate("menu") }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Späť"
+                    contentDescription = stringResource(R.string.spat)
                 )
             }
         }
@@ -122,16 +131,19 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(horizontal = if(isLandscape) 60.dp else 40.dp, vertical = if (isLandscape) 10.dp else 10.dp)
+            .padding(
+                horizontal = if (isLandscape) 60.dp else 40.dp,
+                vertical = if (isLandscape) 10.dp else 10.dp
+            )
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         EditTextField(
-            label = "Slovo",
+            label = stringResource(R.string.slovo),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Done
             ),
             value = wordInput,
             onValueChanged = { wordInput = it },
@@ -140,7 +152,7 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
                 .fillMaxWidth()
         )
         EditTextField(
-            label = "Preklad",
+            label = stringResource(R.string.preklad),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -155,7 +167,7 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
             selectedLanguage = selectedLanguage,
             onLanguageChanged = {
                 languageViewModel.setLanguage(it)
-                categoryViewModel.loadCategories(it)
+                categoryViewModel.loadCategoriesByLanguage(it)
                 wordAddingScreenViewModel.loadWordsByCategory(categoryInput, it)
             }
         )
@@ -170,7 +182,7 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
         )
 
         Button(
-            onClick = dropUnlessResumed{
+            onClick = {
                 if (wordInput.isNotBlank() && translationInput.isNotBlank() && categoryInput.isNotBlank()) {
                     wordAddingScreenViewModel.checkIfWordExists(
                         word = wordInput.trim(),
@@ -184,6 +196,7 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
                                 categoryInput.trim(),
                                 selectedLanguage.trim()
                             )
+
                             wordInput = ""
                             translationInput = ""
                             categoryInput = ""
@@ -195,14 +208,14 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 16.dp).height(60.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
+                .height(60.dp)
         ) {
             Text(stringResource(R.string.potvrdit))
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        Text(stringResource(R.string.zoznam_slov_v_kateg), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.zoznam_slov_v_kategorii), style = MaterialTheme.typography.titleMedium)
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -218,18 +231,19 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
                     text = "${word.word} – ${word.translated}",
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = dropUnlessResumed{
+                IconButton(onClick = {
                     wordAddingScreenViewModel.removeWord(word.word, word.category,selectedLanguage)
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Odstrániť slovo"
+                        contentDescription = stringResource(R.string.odstr_ni_slovo)
                     )
                 }
             }
         }
     }
 }
+
 /**
  * Rozšírené textové pole s možnosťou výberu kategórie z dropDownMenu menu.
  * Kategóriu je možné zadať aj manuálne.
@@ -269,7 +283,7 @@ fun CategoryDropdownWithInput(
                     expanded = true
                     onCategoryChanged(it)
                 },
-                label = { Text("Kategória") },
+                label = { Text(stringResource(R.string.kategoria)) },
                 modifier = Modifier
                     .focusRequester(focusRequester)
                     .menuAnchor()
@@ -298,6 +312,7 @@ fun CategoryDropdownWithInput(
         }
     }
 }
+
 /**
  * Rozšírené textové pole s možnosťou výberu jazyka z dropDownMenu menu.
  * Jazyk je možné zadať aj manuálne .
@@ -335,7 +350,7 @@ fun LanguageDropdownWithInput(
                     expanded = true
                     onLanguageChanged(it)
                 },
-                label = { Text("Jazyk") },
+                label = { Text(stringResource(R.string.jazyk)) },
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
@@ -363,6 +378,8 @@ fun LanguageDropdownWithInput(
         }
     }
 }
+
+
 
 /**
  * Univerzálne vstupné pole pre text s popisným štítkom.

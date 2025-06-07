@@ -69,17 +69,20 @@ import kotlinx.coroutines.delay
 @Composable
 fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navHostController: NavHostController) {
     val guessedWord by viewModel.correctWord.collectAsState()
-    val options by viewModel.options.collectAsState()
+    val buttonOptions by viewModel.options.collectAsState()
     val gameFinished by viewModel.gameFinished.collectAsState()
     val category by categoryViewModel.selectedCategory.collectAsState()
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
     val alreadyLoaded = rememberSaveable { mutableStateOf(false) }
+    val notEnoughWords by viewModel.notEnoughWords.collectAsState()
+
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val score by viewModel.score.collectAsState()
     val numberOfQuestions by viewModel.questions.collectAsState()
+
     LaunchedEffect(category) {
         if(!alreadyLoaded.value && category != null) {
             category?.let {
@@ -88,7 +91,13 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                 alreadyLoaded.value = true
             }
         }
+    }
 
+    LaunchedEffect(notEnoughWords) {
+        if (notEnoughWords) {
+            navHostController.navigate("word")
+            viewModel.setNotEnoughWords(false)
+        }
     }
 
     val poppins = FontFamily(
@@ -118,11 +127,12 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent,
             titleContentColor = Color.Black, navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = dropUnlessResumed{navHostController.popBackStack()
-                viewModel.resetGame()}) {
+            IconButton(onClick = dropUnlessResumed{viewModel.resetGame()
+                navHostController.popBackStack()
+            }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.sp)
+                    contentDescription = stringResource(R.string.spat)
                 )
             }
         }
@@ -141,7 +151,6 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                 viewModel.resetGame()
                 navHostController.popBackStack()
             }
-
         )
     } else {
         Text(
@@ -176,7 +185,8 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                 Spacer(modifier = Modifier.height(16.dp))
 
                 for (i in 0..3) {
-                    val word = options.getOrNull(i) ?: continue
+                    val word = buttonOptions.getOrNull(i) ?: continue
+
                     category?.let { cat ->
                         guessedWord?.let { correct ->
                             BetterButtons(
@@ -189,13 +199,13 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                                 viewModel = viewModel
                             )
                         }
-
                     }
                 }
             }
         }
     }
 }
+
 /**
  * Composable komponent zobrazujúci koniec hry.
  *
@@ -213,7 +223,6 @@ fun EndGame(
     correctAnswers:Int,
     onRestart: ()-> Unit,
     onBackToMenu: ()-> Unit
-
 ){
     Column(
         modifier = Modifier
@@ -223,7 +232,7 @@ fun EndGame(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Tvoje finálne skóre je: $score / $correctAnswers",
+            text = stringResource(R.string.tvoje_fin_lne_sk_re_je, score, correctAnswers),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -240,6 +249,7 @@ fun EndGame(
         }
     }
 }
+
 /**
  * Composable komponent reprezentujúci jedno z tlačidiel s možnosťou odpovede.
  *

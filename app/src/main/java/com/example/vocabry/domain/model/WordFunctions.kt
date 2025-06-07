@@ -35,6 +35,8 @@ interface WordFunctions {
      * @return Zoznam unikátnych názvov kategórii
      */
     suspend fun getAllCategories(): List<String>
+
+    suspend fun getAllCategoriesByLanguage(language: String): List<String>
     /**
      *  Získa zoznam všetkých slovíčok vo zvolenej kategórii a vo zvolenom jazyku
      *  @param category Kategória z ktorej sa majú slovíčka vyberať

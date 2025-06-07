@@ -30,6 +30,15 @@ interface WordDao {
     suspend fun getAllCategories(): List<String>
 
     /**
+     * Získa zoznam všetkých unikátnych kategórií pre daný jazyk.
+     *
+     * @param language Jazyk, v ktorom hladáme kategórie
+     * @return Zoznam názvov kategórií bez opakovania.
+     */
+    @Query("SELECT DISTINCT category FROM words WHERE language = :language")
+    suspend fun getAllCategoriesByLanguage(language: String): List<String>
+
+    /**
      * Získa všetky slovíčka, ktoré patria do konkrétnej kategórie a jazyka.
      *
      * @param category Názov kategórie.

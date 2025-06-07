@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+
 /**
  * ViewModel, ktorý sa zaoberá o správu slovíčok,skóre a generovanie otázok
  *
@@ -49,14 +50,23 @@ class QuestionScreenViewModel (
     private val _questions = MutableStateFlow(0)
     val questions: StateFlow<Int> = _questions
 
+    private val _notEnoughWords = MutableStateFlow(false)
+    val notEnoughWords: StateFlow<Boolean> = _notEnoughWords
+
     /**
      * Vygeneruje novú otázku (správne slovo a možnosti do tlačítok)
      */
     fun generateNewQuestion(category: String,language:String) {
         viewModelScope.launch {
-            val allWords = getWordsByCategory(category,language)
+            _notEnoughWords.value = false
+            val totalWords = getList(language)
+            if(totalWords.size < 4) {
+                _notEnoughWords.value = true
+                return@launch
+            }
+            val allWordsInCategory = getWordsByCategory(category,language)
             // Zo zoznamu všetkych slov vyfiltruej všetky slová ktoré boli už použité
-            val unusedWords = allWords.filterNot{
+            val unusedWords = allWordsInCategory.filterNot{
                     used->_alreadyUsed.value.any{ it.word == used.word }
             }
             // Ak existujú ešte nejaké nepoužité slovíčká/o tak sa zo zoznamu náhodne vyberie nejaké slovo ako hádané, a vygenerujú sa k nemu možnosti do tlačítok
@@ -133,6 +143,19 @@ class QuestionScreenViewModel (
             val words = getWordsByCategory(category,language)
             _questions.value = words.size
         }
+    }
+
+    /**
+     * Nastaví stav indikujúci, či je v hre nedostatok slov.
+     *
+     * Tento stav je určený pre UI, ktoré podľa neho môže napríklad
+     * zobraziť varovanie používateľovi. Hodnota sa nastavuje do
+     * pozorovateľného [StateFlow] `_notEnoughWords`.
+     *
+     * @param value `true`, ak nie je dostatok slov na generovanie otázky, inak `false`.
+     */
+    fun setNotEnoughWords(value: Boolean) {
+        _notEnoughWords.value = value
     }
 
 }
