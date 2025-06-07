@@ -31,14 +31,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.dropUnlessResumed
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 
+/**
+ * Composable funkcia zodpovedná za zobrazenie obrazovky výberu kategórie.
+ *
+ * Táto obrazovka umožňuje používateľovi vybrať si kategóriu pre učenie slovíčok v závislosti
+ * od aktuálne vybraného jazyka. Po výbere sa používateľ presmeruje na obrazovku so začiatkom testu.
+ *
+ * @param categoryViewModel ViewModel, ktorý poskytuje zoznam kategórií a umožňuje nastaviť vybranú kategóriu.
+ * @param languageViewModel ViewModel, ktorý poskytuje aktuálne vybraný jazyk.
+ * @param navHostController Navigačný kontrolér, ktorý umožňuje prechod medzi obrazovkami.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navController: NavController) {
+fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navHostController: NavHostController) {
     val categories by categoryViewModel.categories.collectAsState()
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
 
@@ -65,7 +75,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = dropUnlessResumed{navController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{navHostController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.sp)
@@ -87,7 +97,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
             Button(
                 onClick = dropUnlessResumed{
                     categoryViewModel.selectedCategory(category,selectedLanguage)
-                    navController.navigate("start")
+                    navHostController.navigate("start")
                 },
                 modifier = Modifier
                     .fillMaxWidth()

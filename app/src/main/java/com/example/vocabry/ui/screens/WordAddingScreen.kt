@@ -57,7 +57,18 @@ import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.CategoryViewModel
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
-
+/**
+ * Obrazovka na pridávanie nových slov do databázy.
+ *
+ * Používateľ môže zadať nové slovo, preklad, vybrať kategóriu a jazyk. Tiež je možné odstrániť
+ * existujúce slová v aktuálnej kategórii. Po pridaní sa zoznam aktualizuje.
+ * Ak človek pridá slovo do kategórie ktorá neexistuje tak daná kategória sa vytvorí
+ *
+ * @param wordAddingScreenViewModel ViewModel pre manipuláciu so slovami.
+ * @param categoryViewModel ViewModel pre prácu s kategóriami.
+ * @param languageViewModel ViewModel pre výber jazyka.
+ * @param navHostController Navigačný kontrolér pre návrat späť.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
@@ -219,7 +230,14 @@ fun WordAddingScreen(wordAddingScreenViewModel: WordAddingScreenViewModel,
         }
     }
 }
-
+/**
+ * Rozšírené textové pole s možnosťou výberu kategórie z dropDownMenu menu.
+ * Kategóriu je možné zadať aj manuálne.
+ *
+ * @param categories Zoznam dostupných kategórií.
+ * @param selectedCategory Aktuálne vybraná kategória.
+ * @param onCategoryChanged Callback, ktorý sa volá pri zmene kategórie.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDropdownWithInput(
@@ -280,7 +298,14 @@ fun CategoryDropdownWithInput(
         }
     }
 }
-
+/**
+ * Rozšírené textové pole s možnosťou výberu jazyka z dropDownMenu menu.
+ * Jazyk je možné zadať aj manuálne .
+ *
+ * @param languages Zoznam dostupných jazykov.
+ * @param selectedLanguage Aktuálne vybraný jazyk.
+ * @param onLanguageChanged Callback, ktorý sa volá pri zmene jazyka.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageDropdownWithInput(
@@ -339,6 +364,15 @@ fun LanguageDropdownWithInput(
     }
 }
 
+/**
+ * Univerzálne vstupné pole pre text s popisným štítkom.
+ *
+ * @param label Text, ktorý sa zobrazí ako štítok nad poľom.
+ * @param keyboardOptions Nastavenia klávesnice (napr. typ, akcia).
+ * @param value Aktuálna hodnota poľa.
+ * @param onValueChanged Callback, ktorý sa zavolá pri zmene hodnoty.
+ * @param modifier Modifier pre úpravu vzhľadu a správania.
+ */
 @Composable
 fun EditTextField(
     label: String,
@@ -353,6 +387,6 @@ fun EditTextField(
         modifier = modifier,
         onValueChange = onValueChanged,
         label = { Text(label) },
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
     )
 }

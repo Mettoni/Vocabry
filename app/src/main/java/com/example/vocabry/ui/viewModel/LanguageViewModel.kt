@@ -12,18 +12,34 @@ class LanguageViewModel(
 ) : ViewModel() {
 
     private val _languages = MutableStateFlow<List<String>>(emptyList())
+    /**
+     * Verejne dostupný [StateFlow] so zoznamom jazykov.
+     */
     val languages: StateFlow<List<String>> = _languages
 
-    private val _selectedLanguage = MutableStateFlow("English") // default
+    private val _selectedLanguage = MutableStateFlow("English")
+    /**
+     * Verejne dostupný [StateFlow] s aktuálne vybraným jazykom.
+     */
     val selectedLanguage: StateFlow<String> = _selectedLanguage
 
+    /**
+     * Nastaví nový jazyk ako aktuálne vybraný.
+     *
+     * @param language Jazyk, ktorý sa má nastaviť ako vybraný.
+     */
     fun setLanguage(language: String) {
         _selectedLanguage.value = language
     }
 
+    /**
+     * Načíta všetky dostupné jazyky pomocou [getAllLanguagesUseCase]
+     * a aktualizuje hodnotu v [_languages].
+     */
     fun loadLanguages() {
         viewModelScope.launch {
-            _languages.value = getAllLanguagesUseCase()
+            val langs = getAllLanguagesUseCase()
+            _languages.value = langs
         }
     }
 }

@@ -53,7 +53,18 @@ import com.example.vocabry.ui.viewModel.LanguageViewModel
 import com.example.vocabry.ui.viewModel.QuestionScreenViewModel
 import kotlinx.coroutines.delay
 
-
+/**
+ * Composable funkcia pre zobrazenie obrazovky s otázkami v kvíze.
+ *
+ * Zobrazí náhodne vygenerovanú otázku podľa zvolenej kategórie a jazyka, spolu so 4 odpoveďami.
+ * Sleduje stav hry (či sa už skončila), skóre a výber správneho prekladu.
+ * Po ukončení hry sa zobrazí finálne skóre a tlačidlá na reštart alebo návrat do hlavného menu.
+ *
+ * @param viewModel ViewModel pre logiku otázok a skóre.
+ * @param categoryViewModel ViewModel pre správu zvolenej kategórie.
+ * @param languageViewModel ViewModel pre výber jazyka.
+ * @param navHostController Navigačný kontrolér pre prechod medzi obrazovkami.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: CategoryViewModel, languageViewModel: LanguageViewModel, navHostController: NavHostController) {
@@ -85,9 +96,9 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
     )
 
     val languageText = when (selectedLanguage.lowercase()) {
-        "english","en"->"anglicky"
-        "german","ge"->"nemecky"
-        "russian","ru"->"rusky"
+        stringResource(R.string.english), stringResource(R.string.en) -> stringResource(R.string.anglicky)
+        stringResource(R.string.german), stringResource(R.string.ge) -> stringResource(R.string.nemecky)
+        stringResource(R.string.russian), stringResource(R.string.ru) -> stringResource(R.string.rusky)
         else -> selectedLanguage
     }
 
@@ -185,7 +196,17 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
         }
     }
 }
-
+/**
+ * Composable komponent zobrazujúci koniec hry.
+ *
+ * Zobrazí finálne skóre a ponúkne používateľovi možnosť reštartovať hru
+ * alebo sa vrátiť do hlavného menu.
+ *
+ * @param score Dosiahnuté skóre hráča.
+ * @param correctAnswers Celkový počet otázok v hre.
+ * @param onRestart Lambda funkcia, ktorá sa zavolá pri reštarte hry.
+ * @param onBackToMenu Lambda funkcia, ktorá sa zavolá pri návrate do menu.
+ */
 @Composable
 fun EndGame(
     score:Int,
@@ -202,7 +223,7 @@ fun EndGame(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.sprava_skore, score, correctAnswers),
+            text = "Tvoje finálne skóre je: $score / $correctAnswers",
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -219,7 +240,21 @@ fun EndGame(
         }
     }
 }
-
+/**
+ * Composable komponent reprezentujúci jedno z tlačidiel s možnosťou odpovede.
+ *
+ * Podľa správnosti odpovede zmení farbu tlačidla (zelená pre správnu, červená pre nesprávnu),
+ * a v prípade správnej odpovede zvyšuje skóre. Tiež spúšťa načítanie novej otázky.
+ *
+ *
+ * @param word Slovo zobrazené na tlačidle.
+ * @param isCorrect Určuje, či je dané slovo správnou odpoveďou.
+ * @param correctWord Správne slovo, ktoré má byť uhádnuté.
+ * @param category Aktuálne vybraná kategória otázok.
+ * @param language Jazyk, do ktorého je slovo preložené.
+ * @param isLandscape Určuje, či je zariadenie v režime na šírku.
+ * @param viewModel ViewModel, ktorý spravuje logiku otázok a skóre.
+ */
 @Composable
 fun BetterButtons(
     word: Word,
@@ -270,7 +305,8 @@ fun BetterButtons(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp).height(buttonHeight),
+            .padding(4.dp)
+            .height(buttonHeight),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
     ) {
         Text(text = word.translated)

@@ -9,10 +9,24 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.vocabry.R
-
+/**
+ * Pomocná trieda na zobrazovanie notifikácií používateľovi.
+ *
+ * @param context Kontext aplikácie použitý na vytvorenie notifikácie.
+ */
 class NotificationHelper(private val context: Context) {
     private val channelId = "daily_reminder_channel"
-
+    /**
+     * Zobrazí notifikáciu s dennou pripomienkou.
+     *
+     * Vytvorí notifikačný kanál (ak ešte neexistuje) a následne zobrazí
+     * notifikáciu s daným názvom a správou.
+     *
+     * @param title Nadpis notifikácie.
+     * @param message Text správy v notifikácii.
+     *
+     * @RequiresPermission Označuje, že je potrebné povolenie [Manifest.permission.POST_NOTIFICATIONS].
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun showReminderNotification(title: String, message: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

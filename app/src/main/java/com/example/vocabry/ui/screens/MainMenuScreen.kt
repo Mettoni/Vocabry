@@ -33,7 +33,19 @@ import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import com.example.vocabry.R
 import com.example.vocabry.ui.AppScreen
-
+/**
+ * Composable funkcia pre zobrazenie hlavného menu aplikácie.
+ *
+ * Obsahuje tri hlavné tlačidlá:
+ * - „Štart“ – používateľa presmeruje na obrazovku výberu jazyka.
+ * - „Slová“ – používateľa presmeruje na obrazovku správy slovíčok.
+ * - „Koniec“ – zatvorí aplikáciu (volá `finish()` na aktivite).
+ *
+ * Dynamicky reaguje na orientáciu obrazovky pričom prispôsobuje rozmery a rozloženie prvkov
+ * podľa toho, či je zariadenie v režime na výšku alebo na šírku.
+ *
+ * @param navHostController Navigačný kontrolér, ktorý zabezpečuje prechody medzi obrazovkami aplikácie.
+ */
 @SuppressLint("ContextCastToActivity")
 @Composable
 fun MainMenu(navHostController: NavController) {

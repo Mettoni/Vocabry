@@ -29,17 +29,27 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.dropUnlessResumed
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.vocabry.R
 import com.example.vocabry.ui.viewModel.LanguageViewModel
 
+/**
+ * Composable funkcia, ktorá zobrazuje obrazovku výberu jazyka.
+ *
+ * Používateľ si môže vybrať jazyk, v ktorom sa chce učiť slovíčka. Po výbere
+ * sa aktuálne nastavený jazyk uloží do ViewModelu a používateľ je presmerovaný
+ * na obrazovku výberu kategórie.
+ *
+ * @param languageViewModel ViewModel zodpovedný za uchovávanie a správu zoznamu jazykov
+ *                  a aktuálne vybraného jazyka.
+ * @param navHostController Navigačný kontrolér, ktorý zabezpečuje prechody medzi obrazovkami.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguageSelectScreen(
     languageViewModel: LanguageViewModel,
-    navController: NavController,
+    navHostController: NavHostController,
 ) {
-    val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
     val languages by languageViewModel.languages.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -62,10 +72,10 @@ fun LanguageSelectScreen(
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = dropUnlessResumed{navController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed{navHostController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Späť"
+                    contentDescription = stringResource(R.string.spat)
                 )
             }
         }
@@ -79,7 +89,7 @@ fun LanguageSelectScreen(
             Button(
                 onClick = dropUnlessResumed{
                     languageViewModel.setLanguage(lang)
-                    navController.navigate("category")
+                    navHostController.navigate("category")
                 },
                 modifier = Modifier
                     .fillMaxWidth()

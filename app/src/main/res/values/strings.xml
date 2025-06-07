@@ -6,7 +6,6 @@
     <string name="odoberanie_slova">Odoberanie slova</string>
     <string name="vyber_katgoriu">Vyber kategóriu:</string>
     <string name="spat">Späť</string>
-    <string name="sprava_skore">Tvoje finálne skóre je: %1$s\nSprávne odpovede: %2$s</string>
     <string name="zoznam_slov_v_kateg">Zoznam slov v kategórii:</string>
     <string name="exit">Exit</string>
     <string name="words">Words</string>
@@ -17,4 +16,13 @@
     <string name="sp">spät</string>
     <string name="vyber_jazyku">Vyber jazyk</string>
     <string name="otazka">Otázka</string>
+    <string name="english">english</string>
+    <string name="en">en</string>
+    <string name="anglicky">anglicky</string>
+    <string name="nemecky">nemecky</string>
+    <string name="rusky">rusky</string>
+    <string name="german">german</string>
+    <string name="ge">ge</string>
+    <string name="ru">ru</string>
+    <string name="russian">russian</string>
 </resources>

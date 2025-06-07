@@ -31,7 +31,6 @@ class QuestionScreenViewModel (
     private val notifyUserUseCase: NotificationUseCase
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
-    val wordList: StateFlow<List<Word>> = _wordList
 
     private val _options = MutableStateFlow<List<Word>>(emptyList())
     val options: StateFlow<List<Word>> = _options
@@ -40,7 +39,6 @@ class QuestionScreenViewModel (
     val correctWord: StateFlow<Word?> = _correctWord
 
     private val _alreadyUsed = MutableStateFlow<List<Word>>(emptyList())
-    val alreadyUsed: StateFlow<List<Word>> = _alreadyUsed
 
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score

@@ -8,24 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.vocabry.data.WordDatabase
-import com.example.vocabry.data.WordRepository
-import com.example.vocabry.data.notification.NotificationScheduler
-import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
-import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
-import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
-import com.example.vocabry.domain.usecase.GetListUseCase
-import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
-import com.example.vocabry.domain.usecase.NotificationUseCase
-import com.example.vocabry.domain.usecase.RemoveWordUseCase
 import com.example.vocabry.ui.AppNavigation
 import com.example.vocabry.ui.theme.VocabryTheme
 import com.example.vocabry.ui.viewModel.CategoryViewModel
@@ -37,69 +23,74 @@ import com.example.vocabry.ui.viewModel.QuestionScreenViewModelFactory
 import com.example.vocabry.ui.viewModel.WordAddingScreenViewModel
 import com.example.vocabry.ui.viewModel.WordAddingScreenViewModelFactory
 
+/**
+ * Hlavná aktivita aplikácie, ktorá inicializuje prostredie,
+ * zabezpečuje povolenia a nastavuje všetky ViewModely a navigáciu.
+ */
 class MainActivity : ComponentActivity() {
-
+    /**
+     * Spúšťač pre požiadanie o notifikačné povolenie (pre Android 13+).
+     */
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-
-    }
-
+    ) { isGranted -> }
+    /**
+     * Metóda volaná pri vytváraní aktivity.
+     * Inicializuje ViewModelFactories a nastavuje obsah UI pomocou Compose.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when {
-                ContextCompat.checkSelfPermission(
+            if (ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {}
-                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> { }
-                else -> requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
 
-        val database = WordDatabase.getDatabase(applicationContext)
-        val dao = database.wordDao()
-        val wordFunctions = WordRepository(dao)
-        val notifyUserUseCase = NotificationUseCase(NotificationScheduler())
+        val app = application as VocabryApplication
 
-        val viewModelFactory = QuestionScreenViewModelFactory(
-            AddWordUseCase(wordFunctions),
-            GetWordsByCategoryUseCase(wordFunctions),
-            GetListUseCase(wordFunctions),
-            GetButtonOptionsUseCase(wordFunctions),
-            notifyUserUseCase
-        )
-        val categoryViewModelFactory = CategoryViewModelFactory(
-            GetAllCategoriesUseCase(wordFunctions),
-            GetWordsByCategoryUseCase(wordFunctions)
+        val questionVMFactory = QuestionScreenViewModelFactory(
+            app.addWordUseCase,
+            app.getWordsByCategoryUseCase,
+            app.getListUseCase,
+            app.getButtonOptionsUseCase,
+            app.notificationUseCase
         )
 
-        val languageViewModelFactory = LanguageViewModelFactory(
-            GetAllLanguagesUseCase(wordFunctions)
+        val categoryVMFactory = CategoryViewModelFactory(
+            app.getAllCategoriesUseCase,
+            app.getWordsByCategoryUseCase
         )
 
-        val wordAddingViewModelFactory = WordAddingScreenViewModelFactory(
-            AddWordUseCase(wordFunctions),
-            RemoveWordUseCase(wordFunctions),
-            GetWordsByCategoryUseCase(wordFunctions),
-            GetListUseCase(wordFunctions)
+        val languageVMFactory = LanguageViewModelFactory(
+            app.getAllLanguagesUseCase
+        )
+
+        val wordAddingVMFactory = WordAddingScreenViewModelFactory(
+            app.addWordUseCase,
+            app.removeWordUseCase,
+            app.getWordsByCategoryUseCase,
+            app.getListUseCase
         )
         enableEdgeToEdge()
         setContent {
             VocabryTheme {
                 val navController = rememberNavController()
-                val viewModel: QuestionScreenViewModel = viewModel(factory = viewModelFactory)
-                val categoryViewModel: CategoryViewModel = viewModel(factory = categoryViewModelFactory)
-                val languageViewModel: LanguageViewModel = viewModel(factory = languageViewModelFactory)
-                val wordAddingViewModel: WordAddingScreenViewModel = viewModel(factory = wordAddingViewModelFactory)
 
-                viewModel.scheduleNotification(applicationContext)
+                val questionViewModel: QuestionScreenViewModel = viewModel(factory = questionVMFactory)
+                val categoryViewModel: CategoryViewModel = viewModel(factory = categoryVMFactory)
+                val languageViewModel: LanguageViewModel = viewModel(factory = languageVMFactory)
+                val wordAddingViewModel: WordAddingScreenViewModel = viewModel(factory = wordAddingVMFactory)
+
+                questionViewModel.scheduleNotification(applicationContext)
 
                 AppNavigation(
                     navController = navController,
-                    questionScreenViewModel = viewModel,
+                    questionScreenViewModel = questionViewModel,
                     categoryViewModel = categoryViewModel,
                     languageViewModel = languageViewModel,
                     wordAddingScreenViewModel = wordAddingViewModel,
@@ -107,21 +98,5 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VocabryTheme {
-        Greeting("Android")
     }
 }

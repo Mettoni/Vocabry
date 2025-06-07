@@ -11,6 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel pre obrazovku pridávania slov.
+ * Zodpovedá za manipuláciu so slovami – pridávanie, mazanie, načítavanie podľa kategórií a jazyka.
+ *
+ * @param addWordUseCase Use case pre pridanie slova.
+ * @param removeWordUseCase Use case pre odstránenie slova.
+ * @param getWordsByCategory Use case na získanie slov podľa kategórie a jazyka.
+ * @param getList Use case na získanie celého zoznamu slov podľa jazyka.
+ */
 class WordAddingScreenViewModel(
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
@@ -19,7 +28,14 @@ class WordAddingScreenViewModel(
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
     val wordList: StateFlow<List<Word>> = _wordList
-
+    /**
+     * Pridá nové slovo a aktualizuje celý zoznam slov pre daný jazyk.
+     *
+     * @param word Slovo, ktoré sa má pridať.
+     * @param translation Preklad slova.
+     * @param category Kategória slova.
+     * @param language Jazyk slova.
+     */
     fun addWord(word: String,translation: String, category: String,language:String) {
         viewModelScope.launch {
             addWordUseCase(word,translation,category,language)
@@ -27,19 +43,38 @@ class WordAddingScreenViewModel(
         }
     }
 
+    /**
+     * Načíta slová z danej kategórie a jazyka.
+     *
+     * @param category Názov kategórie.
+     * @param language Jazyk slov.
+     */
     fun loadWordsByCategory(category: String,language:String){
         viewModelScope.launch {
             _wordList.value = getWordsByCategory(category,language)
         }
     }
-
+    /**
+     * Odstráni slovo z danej kategórie a znovu načíta slová v tejto kategórii.
+     *
+     * @param word Slovo, ktoré sa má odstrániť.
+     * @param category Kategória, z ktorej sa má slovo odstrániť.
+     * @param language Jazyk slov.
+     */
     fun removeWord(word:String,category: String,language:String) {
         viewModelScope.launch {
             removeWordUseCase(word,category,language)
             loadWordsByCategory(category,language)
         }
     }
-
+    /**
+     * Skontroluje, či slovo už existuje v danej kategórii a jazyku.
+     *
+     * @param word Slovo, ktoré sa má overiť.
+     * @param category Kategória, v ktorej sa má hľadať.
+     * @param language Jazyk, v ktorom sa má hľadať.
+     * @param onResult Callback, ktorý vráti true, ak slovo existuje, inak false.
+     */
     fun checkIfWordExists(word: String, category: String,language:String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val wordsInCategory = getWordsByCategory(category,language)
@@ -49,7 +84,11 @@ class WordAddingScreenViewModel(
             onResult(exists)
         }
     }
-
+    /**
+     * Aktualizuje celý zoznam slov pre daný jazyk.
+     *
+     * @param language Jazyk, pre ktorý sa má načítať zoznam.
+     */
     fun refreshWords(language:String) {
         viewModelScope.launch {
             _wordList.value = getList(language)
