@@ -1,103 +1,143 @@
 package com.example.vocabry.ui.viewModel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabry.domain.model.Word
-import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
+import com.example.vocabry.domain.usecase.AddScoreUseCase
+import com.example.vocabry.domain.usecase.AddWordIfNotExistsUseCase
+import com.example.vocabry.domain.usecase.GenerateQuestionUseCase
 import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
-import com.example.vocabry.domain.usecase.NotificationUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 
 /**
- * ViewModel, ktorý sa zaoberá o správu slovíčok,skóre a generovanie otázok
+ * ViewModel zodpovedný za logiku hry vo forme otázok a odpovedí na slovíčka.
  *
- * @author Filip Ďurana
- * @param addWordUseCase UseCase na pridanie slovíčka
- * @param getWordsByCategory UseCase ktorý vráti všetky slovíčka z vybranej kategórie
- * @param getList UseCase na získanie všetkých slov
- * @param generateOptions UseCase ktorý vygeneruje možnosti do tlačítok
- * @param notifyUserUseCase UseCase na plánovanie notifikácií
+ * Spravuje aktuálnu otázku, možnosti odpovedí, skóre hráča a stav hry.
+ * Spolupracuje s príslušnými use case triedami na získavanie slov,
+ * generovanie otázok, pridávanie nesprávnych odpovedí do kategórie "Chyby"
+ * a správu skóre.
+ *
+ * @property getWordsByCategory UseCase na získanie slov z danej kategórie a jazyka.
+ * @property getList UseCase na získanie celého zoznamu slov pre jazyk.
+ * @property addWordIfNotExistsUseCase UseCase na pridanie slova do databázy ak ešte neexistuje.
+ * @property generateQuestion UseCase na vygenerovanie novej otázky s možnosťami.
+ * @property addScoreUseCase UseCase na manipuláciu so skóre hráča.
  */
 class QuestionScreenViewModel (
-    private val addWordUseCase: AddWordUseCase,
     private val getWordsByCategory:GetWordsByCategoryUseCase,
     private val getList: GetListUseCase,
-    private val generateOptions: GetButtonOptionsUseCase,
-    private val notifyUserUseCase: NotificationUseCase
+    private val addWordIfNotExistsUseCase: AddWordIfNotExistsUseCase,
+    private val generateQuestion: GenerateQuestionUseCase,
+    private val addScoreUseCase: AddScoreUseCase,
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
 
     private val _options = MutableStateFlow<List<Word>>(emptyList())
+    /**
+     * Aktuálne možné odpovede pre zobrazenie v UI.
+     */
     val options: StateFlow<List<Word>> = _options
 
     private val _correctWord = MutableStateFlow<Word?>(null)
+    /**
+     * Správne slovo, ktoré má používateľ uhádnuť.
+     */
     val correctWord: StateFlow<Word?> = _correctWord
 
     private val _alreadyUsed = MutableStateFlow<List<Word>>(emptyList())
 
     private val _score = MutableStateFlow(0)
+    /**
+     * Aktuálne skóre používateľa.
+     */
     val score: StateFlow<Int> = _score
 
     private val _gameFinished = MutableStateFlow(false)
+    /**
+     * Indikuje, či sa hra skončila.
+     */
     val gameFinished: StateFlow<Boolean> = _gameFinished
 
     private val _questions = MutableStateFlow(0)
+    /**
+     * Počet otázok v hre (napr. počet slov v kategórii).
+     */
     val questions: StateFlow<Int> = _questions
 
     private val _notEnoughWords = MutableStateFlow(false)
+    /**
+     * Indikátor, že nie je dostatok slov na vytvorenie otázky.
+     * UI môže podľa toho presmerovať používateľa.
+     */
     val notEnoughWords: StateFlow<Boolean> = _notEnoughWords
 
     /**
-     * Vygeneruje novú otázku (správne slovo a možnosti do tlačítok)
+     * Vygeneruje novú otázku na základe zvolenej kategórie a jazyka.
+     *
+     * Funkcia použije [GenerateQuestionUseCase] na získanie správneho slova a možností odpovedí,
+     * pričom zohľadňuje už použité slová. Výsledok sa spracuje nasledovne:
+     * - Ak nie je dostatok slov, nastaví [_notEnoughWords] na `true`.
+     * - Ak sú všetky slová použité, nastaví [_gameFinished] na `true`.
+     * - Ak je otázka úspešne vygenerovaná, aktualizuje [_correctWord] a [_options],
+     *   a pridá správne slovo do zoznamu už použitých.
+     *
+     * @param category Kategória, z ktorej sa majú generovať slová.
+     * @param language Jazyk, pre ktorý sa generuje otázka.
      */
-    fun generateNewQuestion(category: String,language:String) {
+    fun generateNewQuestion(category: String, language: String) {
         viewModelScope.launch {
-            _notEnoughWords.value = false
-            val totalWords = getList(language)
-            if(totalWords.size < 4) {
-                _notEnoughWords.value = true
-                return@launch
-            }
-            val allWordsInCategory = getWordsByCategory(category,language)
-            // Zo zoznamu všetkych slov vyfiltruej všetky slová ktoré boli už použité
-            val unusedWords = allWordsInCategory.filterNot{
-                    used->_alreadyUsed.value.any{ it.word == used.word }
-            }
-            // Ak existujú ešte nejaké nepoužité slovíčká/o tak sa zo zoznamu náhodne vyberie nejaké slovo ako hádané, a vygenerujú sa k nemu možnosti do tlačítok
-            if(!unusedWords.isEmpty()) {
-                val correct = unusedWords.random()
-                val options = generateOptions(correct,language)
+            val result = generateQuestion.invoke(category, language, _alreadyUsed.value)
 
-                _correctWord.value = correct
-                _options.value = options
-                _alreadyUsed.value += correct
-            } else {
-                _gameFinished.value = true
+            when {
+                result.notEnoughWords -> {
+                    _notEnoughWords.value = true
+                }
+
+                result.gameFinished -> {
+                    _gameFinished.value = true
+                }
+
+                result.success -> {
+                    _correctWord.value = result.correctWord
+                    _options.value = result.options
+                    result.correctWord?.let {
+                        _alreadyUsed.value = _alreadyUsed.value + it
+                    }
+                }
             }
         }
     }
 
     /**
-     *  Skontroluje, či dané slovo už existuje v kategórii a jazuyku
+     * Overí, či dané slovo už existuje v zadanej kategórii a jazyku.
+     *
+     * Ak slovo ešte neexistuje, pridá ho pomocou [AddWordIfNotExistsUseCase]
+     * a následne obnoví zoznam slov. Výsledok operácie je vrátený
+     * prostredníctvom spätného volania [onResult].
+     *
+     * @param word Slovo, ktoré sa má overiť a prípadne pridať.
+     * @param translation Preklad slova.
+     * @param category Kategória, do ktorej slovo patrí.
+     * @param language Jazyk, pre ktorý sa slovo overuje/pridáva.
+     * @param onResult Callback, ktorý signalizuje, či bolo slovo pridané (`true`), alebo už existovalo (`false`).
      */
-    fun checkIfWordExists(word: String,translation: String, category: String,language:String, onResult: (Boolean) -> Unit) {
+    fun checkAndAddWord(
+        word: String,
+        translation: String,
+        category: String,
+        language: String,
+        onResult: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
-            val wordsInCategory = getWordsByCategory(category,language)
-            val exists = wordsInCategory.any {
-                it.word.equals(word.trim(), ignoreCase = true)
-            }
-
-            if (!exists) {
-                addWordUseCase(word, translation, category, language)
-                refreshWords(language)
-            }
-            onResult(!exists)
+            val added = addWordIfNotExistsUseCase(
+                word, translation, category, language,
+                afterAdd = { refreshWords(language) }
+            )
+            onResult(added)
         }
     }
 
@@ -105,6 +145,7 @@ class QuestionScreenViewModel (
      *  Resetuje hru
      */
     fun resetGame() {
+        addScoreUseCase.reset()
         _alreadyUsed.value = emptyList()
         _score.value = 0
         _correctWord.value = null
@@ -114,6 +155,8 @@ class QuestionScreenViewModel (
 
     /**
      * Obnoví zoznam slov pre daný jazyk
+     *
+     * @param language Jazyk v ktorom chcem obnoviť zoznam slov
      */
     fun refreshWords(language:String) {
         viewModelScope.launch {
@@ -124,19 +167,15 @@ class QuestionScreenViewModel (
     /**
      * Pridá skóre hráčovi
      */
-    fun addScore(score:Int) {
-        _score.value += score
-    }
-
-    /**
-     * Spustí naplánovanie dennej notifikácie
-     */
-    fun scheduleNotification(context: Context) {
-        notifyUserUseCase.invoke(context)
+    fun onCorrectAnswer() {
+        _score.value = addScoreUseCase(1)
     }
 
     /**
      * Spočíta otázky v danej kategórii a jazyku
+     *
+     * @param category V ktorej kategórii chceme zistit počet otázok
+     * @param language V ktorom jazyku chcem zistiť počet otázok
      */
     fun numberOfQuestions(category: String, language: String) {
         viewModelScope.launch {
@@ -146,13 +185,8 @@ class QuestionScreenViewModel (
     }
 
     /**
-     * Nastaví stav indikujúci, či je v hre nedostatok slov.
-     *
-     * Tento stav je určený pre UI, ktoré podľa neho môže napríklad
-     * zobraziť varovanie používateľovi. Hodnota sa nastavuje do
-     * pozorovateľného [StateFlow] `_notEnoughWords`.
-     *
-     * @param value `true`, ak nie je dostatok slov na generovanie otázky, inak `false`.
+     * Nastavuje boolean na požadovanú hodnotu
+     * @param value Hodnota na ktorú chceme daný boolean nastaviť
      */
     fun setNotEnoughWords(value: Boolean) {
         _notEnoughWords.value = value

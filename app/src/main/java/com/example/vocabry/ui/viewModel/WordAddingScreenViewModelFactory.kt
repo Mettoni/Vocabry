@@ -3,7 +3,6 @@ package com.example.vocabry.ui.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
 
@@ -13,14 +12,12 @@ import com.example.vocabry.domain.usecase.RemoveWordUseCase
  * @property addWordUseCase Use case pre pridanie nového slovíčka.
  * @property removeWordUseCase Use case pre odstránenie slovíčka.
  * @property getWordsByCategory Use case pre získanie slov podľa kategórie.
- * @property getList Use case pre získanie zoznamu slovíčok.
  * @throws IllegalArgumentException ak požadovaný typ nie je [WordAddingScreenViewModel].
  */
 class WordAddingScreenViewModelFactory(
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
-    private val getWordsByCategory: GetWordsByCategoryUseCase,
-    private val getList: GetListUseCase
+    private val getWordsByCategory: GetWordsByCategoryUseCase
 ) : ViewModelProvider.Factory {
 
     /**
@@ -36,8 +33,7 @@ class WordAddingScreenViewModelFactory(
             return WordAddingScreenViewModel(
                 addWordUseCase,
                 removeWordUseCase,
-                getWordsByCategory,
-                getList
+                getWordsByCategory
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

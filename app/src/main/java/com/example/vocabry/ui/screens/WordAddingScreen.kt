@@ -27,6 +27,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -97,9 +98,7 @@ fun WordAddingScreen(
         }
 
     }
-    Box(modifier = Modifier
-        .background(Color(0xFF80B6F0))
-        .fillMaxSize()) {
+    Box(modifier = Modifier.background(Color(0xFF80B6F0)).fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -131,10 +130,7 @@ fun WordAddingScreen(
     Column(
         modifier = Modifier
             .statusBarsPadding()
-            .padding(
-                horizontal = if (isLandscape) 60.dp else 40.dp,
-                vertical = if (isLandscape) 10.dp else 10.dp
-            )
+            .padding(horizontal = if(isLandscape) 60.dp else 40.dp, vertical = if (isLandscape) 10.dp else 10.dp)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -148,7 +144,7 @@ fun WordAddingScreen(
             value = wordInput,
             onValueChanged = { wordInput = it },
             modifier = Modifier
-                .padding(top = if (isLandscape) 10.dp else 100.dp)
+                .padding(top = if(isLandscape) 10.dp else 100.dp)
                 .fillMaxWidth()
         )
         EditTextField(
@@ -197,19 +193,20 @@ fun WordAddingScreen(
                                 selectedLanguage.trim()
                             )
 
+                            wordAddingScreenViewModel.loadWordsByCategory(categoryInput.trim(), selectedLanguage.trim())
+                            categoryViewModel.loadCategoriesByLanguage(selectedLanguage)
+
+
                             wordInput = ""
                             translationInput = ""
-                            categoryInput = ""
 
-                            wordAddingScreenViewModel.loadWordsByCategory(categoryInput.trim(), selectedLanguage.trim())
                         }
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 16.dp)
-                .height(60.dp)
+                .padding(top = 16.dp, bottom = 16.dp).height(60.dp)
         ) {
             Text(stringResource(R.string.potvrdit))
         }
@@ -233,6 +230,8 @@ fun WordAddingScreen(
                 )
                 IconButton(onClick = {
                     wordAddingScreenViewModel.removeWord(word.word, word.category,selectedLanguage)
+                    categoryViewModel.loadCategoriesByLanguage(selectedLanguage)
+
                 }) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -261,12 +260,12 @@ fun CategoryDropdownWithInput(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var localInput by remember { mutableStateOf(selectedCategory) }
-    var filteredCategories by remember { mutableStateOf(categories) }
 
-    LaunchedEffect(localInput, categories) {
-        filteredCategories = categories.filter {
-            it.contains(localInput, ignoreCase = true)
-        }
+    LaunchedEffect(selectedCategory) {
+        localInput = selectedCategory
+    }
+    val filteredCategories = categories.filter {
+        it.contains(localInput, ignoreCase = true)
     }
 
     val focusRequester = remember { FocusRequester() }
@@ -286,7 +285,7 @@ fun CategoryDropdownWithInput(
                 label = { Text(stringResource(R.string.kategoria)) },
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryEditable, enabled = true)
                     .fillMaxWidth(),
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -352,7 +351,7 @@ fun LanguageDropdownWithInput(
                 },
                 label = { Text(stringResource(R.string.jazyk)) },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryEditable, enabled = true)
                     .fillMaxWidth(),
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded)
@@ -378,8 +377,6 @@ fun LanguageDropdownWithInput(
         }
     }
 }
-
-
 
 /**
  * Univerzálne vstupné pole pre text s popisným štítkom.

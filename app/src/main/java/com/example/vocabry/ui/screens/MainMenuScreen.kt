@@ -53,7 +53,7 @@ fun MainMenu(navHostController: NavController) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    val SignikaNegative = FontFamily(
+    val signikaNegative = FontFamily(
         Font(R.font.signika_negative)
     )
 
@@ -73,7 +73,7 @@ fun MainMenu(navHostController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Vocabry",fontSize = 100.sp,fontFamily = SignikaNegative,style = MaterialTheme.typography.titleLarge, color = Color.White)
+            Text("Vocabry",fontSize = 100.sp,fontFamily = signikaNegative,style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
     }
 

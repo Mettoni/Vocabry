@@ -35,7 +35,16 @@ interface WordFunctions {
      * @return Zoznam unikátnych názvov kategórii
      */
     suspend fun getAllCategories(): List<String>
-
+    /**
+     * Získa všetky jedinečné názvy kategórií pre daný jazyk.
+     *
+     * Táto suspend funkcia prehľadá uložené slová a vráti zoznam názvov
+     * kategórií, ktoré patria k zadanému jazyku. Výsledný zoznam môže byť
+     * prázdny, ak sa v danom jazyku nenachádzajú žiadne slová.
+     *
+     * @param language Jazyk, podľa ktorého sa filtrujú kategórie.
+     * @return Zoznam názvov kategórií ako reťazce.
+     */
     suspend fun getAllCategoriesByLanguage(language: String): List<String>
     /**
      *  Získa zoznam všetkých slovíčok vo zvolenej kategórii a vo zvolenom jazyku

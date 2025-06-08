@@ -14,7 +14,8 @@ import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
  *
  * @property getAllCategoriesUseCase UseCase na načítanie všetkých kategórií.
  * @property getWordsByCategoryUseCase UseCase na načítanie slov podľa kategórie a jazyka.
- * @throws IllegalArgumentException ak požadovaný modelClass nie je podporovaný.
+ * @property getWordsByCategoryUseCase UseCase na načítanie kategórii podla jazyka.
+ * @throws IllegalArgumentException ak požadovaný typ nie je CategoryViewModel.
  */
 class CategoryViewModelFactory(
     private val getAllCategoriesUseCase: GetAllCategoriesUseCase,

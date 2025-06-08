@@ -46,7 +46,7 @@ interface WordDao {
      * @return Zoznam entít [WordEntity] v danej kategórii a jazyku.
      */
     @Query("SELECT * from words where category = :category AND language = :language")
-    suspend fun getByCategory(category: String,language:String): List<WordEntity>
+    suspend fun getWordsByCategory(category: String, language:String): List<WordEntity>
 
     /**
      * Vloží nové slovíčko do databázy. Ak už existuje, ignoruje ho.

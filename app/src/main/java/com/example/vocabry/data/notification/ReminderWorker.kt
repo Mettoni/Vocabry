@@ -3,6 +3,8 @@ package com.example.vocabry.data.notification
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.vocabry.R
+
 /**
  * Worker, ktorý sa vykonáva na pozadí a zodpovedá za zobrazenie pripomienkovej notifikácie používateľovi.
  *
@@ -29,8 +31,8 @@ class ReminderWorker(
         return try {
             val helper = NotificationHelper(applicationContext)
             helper.showReminderNotification(
-                title = "Nezabudni trénovať!",
-                message = "Dnes si ešte netrénoval slovíčka"
+                title = applicationContext.getString(R.string.nezabudni_trenova),
+                message = applicationContext.getString(R.string.dnes_si_este_netrenoval)
             )
             Result.success()
         } catch (e: SecurityException) {

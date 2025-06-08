@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabry.domain.model.Word
 import com.example.vocabry.domain.usecase.AddWordUseCase
-import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +17,11 @@ import kotlinx.coroutines.launch
  * @param addWordUseCase Use case pre pridanie slova.
  * @param removeWordUseCase Use case pre odstránenie slova.
  * @param getWordsByCategory Use case na získanie slov podľa kategórie a jazyka.
- * @param getList Use case na získanie celého zoznamu slov podľa jazyka.
  */
 class WordAddingScreenViewModel(
     private val addWordUseCase: AddWordUseCase,
     private val removeWordUseCase: RemoveWordUseCase,
-    private val getWordsByCategory: GetWordsByCategoryUseCase,
-    private val getList: GetListUseCase
+    private val getWordsByCategory: GetWordsByCategoryUseCase
 ): ViewModel() {
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
     val wordList: StateFlow<List<Word>> = _wordList
@@ -35,11 +32,13 @@ class WordAddingScreenViewModel(
      * @param translation Preklad slova.
      * @param category Kategória slova.
      * @param language Jazyk slova.
+     * @onFinished Callback, ktorý sa zavolá po dokončení operácie. Predvolene je prázdny.
      */
-    fun addWord(word: String,translation: String, category: String,language:String) {
+    fun addWord(word: String,translation: String, category: String,language:String, onFinished: () -> Unit = {}) {
         viewModelScope.launch {
             addWordUseCase(word,translation,category,language)
-            refreshWords(language)
+            loadWordsByCategory(category, language)
+            onFinished()
         }
     }
 
@@ -60,11 +59,13 @@ class WordAddingScreenViewModel(
      * @param word Slovo, ktoré sa má odstrániť.
      * @param category Kategória, z ktorej sa má slovo odstrániť.
      * @param language Jazyk slov.
+     * onFinished Callback, ktorý sa zavolá po dokončení operácie. Predvolene je prázdny.
      */
-    fun removeWord(word:String,category: String,language:String) {
+    fun removeWord(word:String,category: String,language:String,onFinished: () -> Unit = {}) {
         viewModelScope.launch {
             removeWordUseCase(word,category,language)
             loadWordsByCategory(category,language)
+            onFinished()
         }
     }
     /**
@@ -82,16 +83,6 @@ class WordAddingScreenViewModel(
                 it.word.equals(word.trim(), ignoreCase = true)
             }
             onResult(exists)
-        }
-    }
-    /**
-     * Aktualizuje celý zoznam slov pre daný jazyk.
-     *
-     * @param language Jazyk, pre ktorý sa má načítať zoznam.
-     */
-    fun refreshWords(language:String) {
-        viewModelScope.launch {
-            _wordList.value = getList(language)
         }
     }
 }

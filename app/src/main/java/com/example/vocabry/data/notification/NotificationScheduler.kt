@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.vocabry.R
 import java.util.concurrent.TimeUnit
 /**
  * Trieda zodpovedná za naplánovanie pravidelnej dennej pripomienky (notifikácie).
@@ -26,7 +27,7 @@ class NotificationScheduler {
             .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "daily_reminder",
+            context.getString(R.string.daily_reminder),
             ExistingPeriodicWorkPolicy.UPDATE,
             workRequest
         )

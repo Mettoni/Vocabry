@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
  *
  * @property getCategories UseCase na načítanie všetkých dostupných kategórií.
  * @property getWordsByCategory UseCase na načítanie slov podľa kategórie a jazyka.
+ * @property getCategoriesByLanguageUseCase UseCase na načítanie kategórii podla jazyka
  */
 class CategoryViewModel(
     private val getCategories: GetAllCategoriesUseCase,

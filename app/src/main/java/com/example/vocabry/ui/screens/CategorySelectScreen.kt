@@ -56,11 +56,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
         categoryViewModel.loadCategoriesByLanguage(selectedLanguage)
     }
 
-    val scrollState = rememberScrollState()
-
-    Box(modifier = Modifier
-        .background(Color(0xFF80B6F0))
-        .fillMaxSize()) {
+    Box(modifier = Modifier.background(Color(0xFF80B6F0)).fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -75,7 +71,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
             titleContentColor = Color.Black,
             navigationIconContentColor = Color.Black),
         navigationIcon = {
-            IconButton(onClick = dropUnlessResumed{navHostController.popBackStack() }) {
+            IconButton(onClick = dropUnlessResumed {navHostController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.sp)
@@ -84,6 +80,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
         }
     )
 
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .padding(horizontal = 32.dp, vertical = 16.dp)
@@ -91,7 +88,7 @@ fun CategorySelect(categoryViewModel: CategoryViewModel, languageViewModel: Lang
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(R.string.vyber_katgoriu), modifier = Modifier.padding(vertical = 24.dp))
+        Text(stringResource(R.string.vyber_katgoriu), modifier = Modifier.padding(top = 80.dp))
 
         categories.forEach { category ->
             Button(

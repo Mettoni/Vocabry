@@ -55,6 +55,7 @@ fun LanguageSelectScreen(
     LaunchedEffect(Unit) {
         languageViewModel.loadLanguages()
     }
+
     Box(modifier = Modifier
         .background(Color(0xFF80B6F0))
         .fillMaxSize()) {
@@ -83,7 +84,6 @@ fun LanguageSelectScreen(
 
     Column(modifier = Modifier.padding(top = 90.dp,start = 10.dp)) {
         Text(stringResource(R.string.vyber_jazyku), style = MaterialTheme.typography.titleLarge)
-
 
         languages.forEach { lang: String ->
             Button(

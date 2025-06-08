@@ -4,7 +4,10 @@ import android.app.Application
 import com.example.vocabry.data.WordDatabase
 import com.example.vocabry.data.WordRepository
 import com.example.vocabry.data.notification.NotificationScheduler
+import com.example.vocabry.domain.usecase.AddScoreUseCase
+import com.example.vocabry.domain.usecase.AddWordIfNotExistsUseCase
 import com.example.vocabry.domain.usecase.AddWordUseCase
+import com.example.vocabry.domain.usecase.GenerateQuestionUseCase
 import com.example.vocabry.domain.usecase.GetAllCategoriesUseCase
 import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
 import com.example.vocabry.domain.usecase.GetButtonOptionsUseCase
@@ -13,22 +16,29 @@ import com.example.vocabry.domain.usecase.GetListUseCase
 import com.example.vocabry.domain.usecase.GetWordsByCategoryUseCase
 import com.example.vocabry.domain.usecase.NotificationUseCase
 import com.example.vocabry.domain.usecase.RemoveWordUseCase
+
 /**
- * Aplikačná trieda `VocabryApplication`, ktorá inicializuje všetky potrebné
- * závislosti a use case-y pri spustení aplikácie.
+ * Aplikačná trieda `VocabryApplication`, ktorá slúži ako hlavný bod na
+ * manuálnu inicializáciu závislostí (Dependency Injection) pre celú aplikáciu.
  *
- * Táto trieda funguje ako centrálny bod pre konfiguráciu DI (dependency injection)
- * a poskytuje zdieľané inštancie `UseCase` objektov a `WordRepository`.
+ * Táto trieda vytvára a uchováva inštancie `UseCase` objektov, ktoré sú
+ * neskôr poskytované jednotlivým ViewModelom a ďalším komponentom aplikácie.
  *
- * @property wordRepository Inštancia repozitára na prístup k dátam slov.
+ * Používa sa ako vlastná `Application` trieda, ktorá je definovaná v `AndroidManifest.xml`.
+ *
+ *
+ * @property wordRepository Inštancia repozitára pre prístup k slovám v databáze.
  * @property addWordUseCase UseCase pre pridanie slova do databázy.
  * @property removeWordUseCase UseCase pre odstránenie slova z databázy.
  * @property getAllCategoriesUseCase UseCase pre získanie všetkých kategórií.
  * @property getAllLanguagesUseCase UseCase pre získanie všetkých jazykov.
- * @property getListUseCase UseCase pre získanie zoznamu slov.
+ * @property getListUseCase UseCase pre získanie všetkých slov v danom jazyku.
  * @property getWordsByCategoryUseCase UseCase pre načítanie slov podľa kategórie a jazyka.
- * @property getButtonOptionsUseCase UseCase pre generovanie náhodných odpovedí pre tlačítka.
- * @property notificationUseCase UseCase pre plánovanie a zobrazovanie notifikácií.
+ * @property getButtonOptionsUseCase UseCase pre generovanie náhodných odpovedí pre tlačidlá.
+ * @property generateQuestionUseCase UseCase pre zostavenie otázky a možností.
+ * @property addWordIfNotExistsUseCase UseCase, ktorý pridá slovo, ak ešte neexistuje.
+ * @property addScoreUseCase UseCase pre správu skóre.
+ * @property notificationUseCase UseCase pre naplánovanie a zobrazenie notifikácií.
  */
 class VocabryApplication: Application() {
     lateinit var wordRepository: WordRepository
@@ -52,6 +62,12 @@ class VocabryApplication: Application() {
         private set
     lateinit var notificationUseCase: NotificationUseCase
         private set
+    lateinit var generateQuestionUseCase: GenerateQuestionUseCase
+        private set
+    lateinit var addWordIfNotExistsUseCase: AddWordIfNotExistsUseCase
+        private set
+    lateinit var addScoreUseCase: AddScoreUseCase
+        private set
     /**
      * Inicializuje všetky závislosti potrebné pre fungovanie aplikácie.
      * Táto metóda sa spustí automaticky pri štarte aplikácie.
@@ -71,5 +87,10 @@ class VocabryApplication: Application() {
         getWordsByCategoryUseCase = GetWordsByCategoryUseCase(wordRepository)
         getButtonOptionsUseCase = GetButtonOptionsUseCase(wordRepository)
         notificationUseCase = NotificationUseCase(NotificationScheduler())
+        generateQuestionUseCase = GenerateQuestionUseCase(getListUseCase,getWordsByCategoryUseCase,getButtonOptionsUseCase)
+        addWordIfNotExistsUseCase = AddWordIfNotExistsUseCase(getWordsByCategoryUseCase,addWordUseCase)
+        addScoreUseCase = AddScoreUseCase()
+
+        notificationUseCase.invoke(applicationContext)
     }
 }

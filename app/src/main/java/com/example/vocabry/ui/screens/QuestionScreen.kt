@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,7 +76,7 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
     val selectedLanguage by languageViewModel.selectedLanguage.collectAsState()
     val alreadyLoaded = rememberSaveable { mutableStateOf(false) }
     val notEnoughWords by viewModel.notEnoughWords.collectAsState()
-
+    val alreadyAnswered = remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -196,7 +197,8 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                                 correctWord = correct,
                                 language = selectedLanguage,
                                 isLandscape = isLandscape,
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                alreadyAnswered = alreadyAnswered
                             )
                         }
                     }
@@ -232,7 +234,7 @@ fun EndGame(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.tvoje_fin_lne_sk_re_je, score, correctAnswers),
+            text = "Tvoje finálne skóre je: $score / $correctAnswers",
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 32.dp)
@@ -263,7 +265,8 @@ fun EndGame(
  * @param category Aktuálne vybraná kategória otázok.
  * @param language Jazyk, do ktorého je slovo preložené.
  * @param isLandscape Určuje, či je zariadenie v režime na šírku.
- * @param viewModel ViewModel, ktorý spravuje logiku otázok a skóre.
+ * @param viewModel ViewModel, ktorý spravuje logiku otázok a skóre
+ * @param alreadyAnswered Boolean ktorý kontroluje či už bolo kliknuté na nejaké tlačítko.
  */
 @Composable
 fun BetterButtons(
@@ -273,7 +276,8 @@ fun BetterButtons(
     category: String,
     language:String,
     isLandscape:Boolean,
-    viewModel: QuestionScreenViewModel
+    viewModel: QuestionScreenViewModel,
+    alreadyAnswered: MutableState<Boolean>
 ) {
     var clicked by remember { mutableStateOf(false) }
     var showColor by remember { mutableStateOf(false) }
@@ -292,6 +296,7 @@ fun BetterButtons(
             delay(500)
             clicked = false
             showColor = false
+            alreadyAnswered.value = false
             viewModel.generateNewQuestion(category,language)
             triggerNext = false
         }
@@ -299,14 +304,15 @@ fun BetterButtons(
 
     Button(
         onClick = dropUnlessResumed{
-            if (!clicked) {
+            if (!clicked && !alreadyAnswered.value) {
+                alreadyAnswered.value = true
                 clicked = true
                 showColor = true
                 if (isCorrect) {
-                    viewModel.addScore(1)
+                    viewModel.onCorrectAnswer()
                     triggerNext = true
                 } else {
-                    viewModel.checkIfWordExists(correctWord.word, correctWord.translated,"Chyby",language) {
+                    viewModel.checkAndAddWord(correctWord.word, correctWord.translated,"Chyby",language) {
                         triggerNext = true
                     }
                 }

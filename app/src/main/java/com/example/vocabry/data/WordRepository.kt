@@ -76,7 +76,7 @@ class WordRepository(private val dao: WordDao): WordFunctions {
      * @return Zoznam doménových objektov [Word].
      */
     override suspend fun getWordsByCategory(category: String,language:String): List<Word> {
-        return dao.getByCategory(category,language).map{it.toDomain()}
+        return dao.getWordsByCategory(category,language).map{it.toDomain()}
     }
 
     /**
@@ -89,7 +89,7 @@ class WordRepository(private val dao: WordDao): WordFunctions {
      * @return Zoznam náhodných slov (vrátane správnej odpovede), premiešaných.
      */
     override suspend fun getButtonOptions(correctWord: Word,language: String): List<Word> {
-        val categoryWords = dao.getByCategory(correctWord.category,language).filter { it.word != correctWord.word }
+        val categoryWords = dao.getWordsByCategory(correctWord.category,language).filter { it.word != correctWord.word }
         val wordList = if(correctWord.category == "Chyby"|| categoryWords.size < 3) {
             dao.getAllWords(language).filter{it.word != correctWord.word}
         } else {

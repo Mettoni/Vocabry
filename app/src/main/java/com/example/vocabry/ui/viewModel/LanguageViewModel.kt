@@ -6,7 +6,16 @@ import com.example.vocabry.domain.usecase.GetAllLanguagesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel zodpovedný za správu jazykových údajov v aplikácii.
+ *
+ * Poskytuje funkcionalitu na načítanie dostupných jazykov a uchováva
+ * aktuálne vybraný jazyk ako stav pre používateľské rozhranie.
+ * Využíva [GetAllLanguagesUseCase] z doménovej vrstvy na získanie jazykov,
+ * čím dodržiava princípy clean architektúry.
+ *
+ * @property getAllLanguagesUseCase UseCase na načítanie všetkých jazykov z úložiska.
+ */
 class LanguageViewModel(
     private val getAllLanguagesUseCase: GetAllLanguagesUseCase
 ) : ViewModel() {

@@ -32,7 +32,7 @@ class NotificationHelper(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "Denné pripomienky",
+                context.getString(R.string.denn_pripomienky),
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             NotificationManagerCompat.from(context).createNotificationChannel(channel)

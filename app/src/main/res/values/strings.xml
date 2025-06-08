@@ -32,4 +32,8 @@
     <string name="kategoria">Kategória</string>
     <string name="jazyk">Jazyk</string>
     <string name="tvoje_fin_lne_sk_re_je">Tvoje finálne skóre je: %1$s / %2$s</string>
+    <string name="denn_pripomienky">Denné pripomienky</string>
+    <string name="daily_reminder">daily_reminder</string>
+    <string name="nezabudni_trenova">Nezabudni trénovať!</string>
+    <string name="dnes_si_este_netrenoval">Dnes si ešte netrénoval slovíčka</string>
 </resources>

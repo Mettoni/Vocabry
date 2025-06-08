@@ -54,11 +54,11 @@ class MainActivity : ComponentActivity() {
         val app = application as VocabryApplication
 
         val questionVMFactory = QuestionScreenViewModelFactory(
-            app.addWordUseCase,
             app.getWordsByCategoryUseCase,
             app.getListUseCase,
-            app.getButtonOptionsUseCase,
-            app.notificationUseCase
+            app.addWordIfNotExistsUseCase,
+            app.generateQuestionUseCase,
+            app.addScoreUseCase
         )
 
         val categoryVMFactory = CategoryViewModelFactory(
@@ -74,8 +74,7 @@ class MainActivity : ComponentActivity() {
         val wordAddingVMFactory = WordAddingScreenViewModelFactory(
             app.addWordUseCase,
             app.removeWordUseCase,
-            app.getWordsByCategoryUseCase,
-            app.getListUseCase
+            app.getWordsByCategoryUseCase
         )
         enableEdgeToEdge()
         setContent {
@@ -86,8 +85,6 @@ class MainActivity : ComponentActivity() {
                 val categoryViewModel: CategoryViewModel = viewModel(factory = categoryVMFactory)
                 val languageViewModel: LanguageViewModel = viewModel(factory = languageVMFactory)
                 val wordAddingViewModel: WordAddingScreenViewModel = viewModel(factory = wordAddingVMFactory)
-
-                questionViewModel.scheduleNotification(applicationContext)
 
                 AppNavigation(
                     navController = navController,
