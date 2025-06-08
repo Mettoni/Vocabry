@@ -173,7 +173,7 @@ fun QuestionScreen(viewModel: QuestionScreenViewModel, categoryViewModel: Catego
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Ako sa povie po $languageText: ${guessedWord?.word}",
+                    text = stringResource(R.string.ako_sa_povie_po, languageText, guessedWord?.word ?: ""),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     fontFamily = poppins,

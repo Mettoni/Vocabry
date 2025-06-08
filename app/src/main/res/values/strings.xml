@@ -38,4 +38,5 @@
     <string name="dnes_si_este_netrenoval">Dnes si ešte netrénoval slovíčka</string>
     <string name="vocabry">Vocabry</string>
     <string name="tvoje_finalove_skore_je">Tvoje finálne skóre je: %1$s / %2$s</string>
+    <string name="ako_sa_povie_po">Ako sa povie po %1$s: %2$s</string>
 </resources>
