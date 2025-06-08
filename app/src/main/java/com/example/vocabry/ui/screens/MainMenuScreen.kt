@@ -73,7 +73,7 @@ fun MainMenu(navHostController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Vocabry",fontSize = 100.sp,fontFamily = signikaNegative,style = MaterialTheme.typography.titleLarge, color = Color.White)
+            Text(stringResource(R.string.vocabry),fontSize = 100.sp,fontFamily = signikaNegative,style = MaterialTheme.typography.titleLarge, color = Color.White)
         }
     }
 
@@ -88,7 +88,9 @@ fun MainMenu(navHostController: NavController) {
             onClick = dropUnlessResumed{
                 navHostController.navigate(AppScreen.Language.route)
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
         ) {
             Text(stringResource(R.string.start))
         }
@@ -97,7 +99,9 @@ fun MainMenu(navHostController: NavController) {
             onClick = dropUnlessResumed {
                 navHostController.navigate(AppScreen.Word.route)
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
         ) {
             Text(stringResource(R.string.words))
         }
@@ -106,7 +110,9 @@ fun MainMenu(navHostController: NavController) {
             onClick = dropUnlessResumed{
                 activity?.finish()
             },
-            modifier = Modifier.fillMaxWidth().height(60.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
         ) {
             Text(stringResource(R.string.exit))
         }

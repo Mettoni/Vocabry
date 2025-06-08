@@ -36,4 +36,6 @@
     <string name="daily_reminder">daily_reminder</string>
     <string name="nezabudni_trenova">Nezabudni trénovať!</string>
     <string name="dnes_si_este_netrenoval">Dnes si ešte netrénoval slovíčka</string>
+    <string name="vocabry">Vocabry</string>
+    <string name="tvoje_finalove_skore_je">Tvoje finálne skóre je: %1$s / %2$s</string>
 </resources>

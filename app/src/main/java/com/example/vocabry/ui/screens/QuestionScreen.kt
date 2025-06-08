@@ -234,7 +234,7 @@ fun EndGame(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Tvoje finálne skóre je: $score / $correctAnswers",
+            text = stringResource(R.string.tvoje_finalove_skore_je, score, correctAnswers),
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
             modifier = Modifier.padding(bottom = 32.dp)
