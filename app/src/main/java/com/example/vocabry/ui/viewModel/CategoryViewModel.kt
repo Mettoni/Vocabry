@@ -14,7 +14,11 @@ import kotlinx.coroutines.launch
  *
  * @property getCategories UseCase na načítanie všetkých dostupných kategórií.
  * @property getWordsByCategory UseCase na načítanie slov podľa kategórie a jazyka.
- * @property getCategoriesByLanguageUseCase UseCase na načítanie kategórii podla jazyka
+ * @property getCategoriesByLanguageUseCase UseCase na načítanie kategórií podľa jazyka.
+ *
+ * @property categories StateFlow zoznamu kategórií pre aktuálne zvolený jazyk.
+ * @property selectedCategory StateFlow vybranej kategórie.
+ * @property words StateFlow zoznamu slov patriacich do vybranej kategórie.
  */
 class CategoryViewModel(
     private val getCategories: GetAllCategoriesUseCase,
@@ -30,7 +34,6 @@ class CategoryViewModel(
     private val _words = MutableStateFlow<List<Word>>(emptyList())
     val words: StateFlow<List<Word>> = _words
 
-    private val _selectedLanguage = MutableStateFlow("English")
 
     /**
      * Načíta všetky dostupné kategórie z databázy a uloží ich do [categories].
@@ -65,7 +68,6 @@ class CategoryViewModel(
         viewModelScope.launch {
             _words.value = getWordsByCategory(category, language)
             _selectedCategory.value = category
-            _selectedLanguage.value = language
         }
     }
 }

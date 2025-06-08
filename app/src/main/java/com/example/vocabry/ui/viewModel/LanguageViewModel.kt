@@ -15,21 +15,18 @@ import kotlinx.coroutines.launch
  * čím dodržiava princípy clean architektúry.
  *
  * @property getAllLanguagesUseCase UseCase na načítanie všetkých jazykov z úložiska.
+ *
+ * @property languages StateFlow zoznamu dostupných jazykov načítaných z úložiska.
+ * @property selectedLanguage StateFlow aktuálne vybraného jazyka používateľom.
  */
 class LanguageViewModel(
     private val getAllLanguagesUseCase: GetAllLanguagesUseCase
 ) : ViewModel() {
 
     private val _languages = MutableStateFlow<List<String>>(emptyList())
-    /**
-     * Verejne dostupný [StateFlow] so zoznamom jazykov.
-     */
     val languages: StateFlow<List<String>> = _languages
 
     private val _selectedLanguage = MutableStateFlow("English")
-    /**
-     * Verejne dostupný [StateFlow] s aktuálne vybraným jazykom.
-     */
     val selectedLanguage: StateFlow<String> = _selectedLanguage
 
     /**

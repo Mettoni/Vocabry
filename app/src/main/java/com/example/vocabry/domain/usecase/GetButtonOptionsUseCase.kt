@@ -1,5 +1,6 @@
 package com.example.vocabry.domain.usecase
 
+import com.example.vocabry.data.WordRepository
 import com.example.vocabry.domain.model.Word
 import com.example.vocabry.domain.model.WordFunctions
 
@@ -10,16 +11,40 @@ import com.example.vocabry.domain.model.WordFunctions
  *
  *  @param repository Inštancia implementácie rozhrania [WordFunctions], ktorá zabezpečuje prístup do úložiska dát ako je napr. roomDao
  */
-class GetButtonOptionsUseCase(private val repository: WordFunctions) {
+class GetButtonOptionsUseCase(
+    private val repository: WordRepository
+) {
 
     /**
-     *  Vytvorí možnosti možnosti do tlačítok
+     * Vygeneruje zoznam 4 slov, z ktorých jedno je správne (zadané) a ostatné sú náhodne vybrané.
+     * Preferuje slová z rovnakej kategórie, ak ich je dostatok.
      *
-     *  @param correctWord Predstavuje hádané slovíčko
-     *  @param language Jazyk v ktorom majú byť slovíčka v tlačítkach
-     *  @return Slovíčka ktoré sa budú nachádzať v tlačítkach pod otázkou
+     * @param correctWord Slovo, ktoré je správna odpoveď.
+     * @param language Jazyk, z ktorého sa majú slová vyberať.
+     * @return Zoznam slov pre tlačidlá, vrátane správneho.
      */
-    suspend operator fun invoke(correctWord:Word,language:String): List<Word> {
-        return repository.getButtonOptions(correctWord,language)
+    suspend operator fun invoke(correctWord: Word, language: String): List<Word> {
+        val categoryWords = repository
+            .getWordsByCategory(correctWord.category, language)
+            .filter { it.word != correctWord.word }
+
+        val wordList = if (correctWord.category == "Chyby" || categoryWords.size < 3) {
+            repository.getAllWords(language)
+                .filter { it.word != correctWord.word }
+        } else {
+            categoryWords
+        }
+
+        val buttonList = mutableListOf<Word>()
+        buttonList.add(correctWord)
+
+        while (buttonList.size < 4) {
+            val newWord = wordList.random()
+            if (buttonList.none { it.word == newWord.word }) {
+                buttonList.add(newWord)
+            }
+        }
+
+        return buttonList.shuffled()
     }
 }

@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
  * @param addWordUseCase Use case pre pridanie slova.
  * @param removeWordUseCase Use case pre odstránenie slova.
  * @param getWordsByCategory Use case na získanie slov podľa kategórie a jazyka.
+ *
+ * @property wordList StateFlow zoznamu slov v aktuálne vybranej kategórii a jazyku.
  */
 class WordAddingScreenViewModel(
     private val addWordUseCase: AddWordUseCase,

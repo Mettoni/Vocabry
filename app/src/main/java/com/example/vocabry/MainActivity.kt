@@ -76,6 +76,8 @@ class MainActivity : ComponentActivity() {
             app.removeWordUseCase,
             app.getWordsByCategoryUseCase
         )
+        app.notificationUseCase.invoke(applicationContext)
+
         enableEdgeToEdge()
         setContent {
             VocabryTheme {

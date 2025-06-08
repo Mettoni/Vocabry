@@ -23,9 +23,16 @@ import kotlinx.coroutines.launch
  *
  * @property getWordsByCategory UseCase na získanie slov z danej kategórie a jazyka.
  * @property getList UseCase na získanie celého zoznamu slov pre jazyk.
- * @property addWordIfNotExistsUseCase UseCase na pridanie slova do databázy ak ešte neexistuje.
+ * @property addWordIfNotExistsUseCase UseCase na pridanie slova do databázy, ak ešte neexistuje.
  * @property generateQuestion UseCase na vygenerovanie novej otázky s možnosťami.
  * @property addScoreUseCase UseCase na manipuláciu so skóre hráča.
+ *
+ * @property options StateFlow zoznamu aktuálnych odpoveďových možností pre otázku.
+ * @property correctWord StateFlow správneho slovíčka pre aktuálnu otázku.
+ * @property score StateFlow aktuálneho skóre hráča.
+ * @property gameFinished StateFlow indikujúci, či sa hra skončila.
+ * @property questions StateFlow počtu položených otázok v rámci aktuálnej hry.
+ * @property notEnoughWords StateFlow indikujúci, že nie je dostatok slov na vytvorenie otázky.
  */
 class QuestionScreenViewModel (
     private val getWordsByCategory:GetWordsByCategoryUseCase,
@@ -37,42 +44,23 @@ class QuestionScreenViewModel (
     private val _wordList = MutableStateFlow<List<Word>>(emptyList())
 
     private val _options = MutableStateFlow<List<Word>>(emptyList())
-    /**
-     * Aktuálne možné odpovede pre zobrazenie v UI.
-     */
     val options: StateFlow<List<Word>> = _options
 
     private val _correctWord = MutableStateFlow<Word?>(null)
-    /**
-     * Správne slovo, ktoré má používateľ uhádnuť.
-     */
     val correctWord: StateFlow<Word?> = _correctWord
 
     private val _alreadyUsed = MutableStateFlow<List<Word>>(emptyList())
 
     private val _score = MutableStateFlow(0)
-    /**
-     * Aktuálne skóre používateľa.
-     */
     val score: StateFlow<Int> = _score
 
     private val _gameFinished = MutableStateFlow(false)
-    /**
-     * Indikuje, či sa hra skončila.
-     */
     val gameFinished: StateFlow<Boolean> = _gameFinished
 
     private val _questions = MutableStateFlow(0)
-    /**
-     * Počet otázok v hre (napr. počet slov v kategórii).
-     */
     val questions: StateFlow<Int> = _questions
 
     private val _notEnoughWords = MutableStateFlow(false)
-    /**
-     * Indikátor, že nie je dostatok slov na vytvorenie otázky.
-     * UI môže podľa toho presmerovať používateľa.
-     */
     val notEnoughWords: StateFlow<Boolean> = _notEnoughWords
 
     /**

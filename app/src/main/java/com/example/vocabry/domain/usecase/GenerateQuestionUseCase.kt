@@ -3,7 +3,7 @@ package com.example.vocabry.domain.usecase
 import com.example.vocabry.domain.model.Word
 
 /**
- * Výsledok generovania otázky pre kvíz.
+ * Výsledok generovania otázky.
  *
  * Táto trieda reprezentuje rôzne možné výstupy z procesu generovania otázky:
  * - správne slovo, ktoré má byť uhádnuté
@@ -26,7 +26,7 @@ data class QuestionGenerationResult(
 
 
 /**
- * UseCase, ktorý generuje otázku pre kvíz na základe kategórie a jazyka.
+ * UseCase, ktorý generuje otázku na základe kategórie a jazyka.
  *
  * Tento use case využíva ostatné use case-y na získanie všetkých slov,
  * filtrovanie podľa kategórie a výber správnych/náhodných odpovedí.
@@ -41,7 +41,7 @@ class GenerateQuestionUseCase(
     private val getButtonOptionsUseCase: GetButtonOptionsUseCase
 ) {
     /**
-     * Generuje novú otázku pre kvíz.
+     * Generuje novú otázku.
      *
      * @param category Vybraná kategória, z ktorej sa otázka generuje.
      * @param language Jazyk, v ktorom sa používateľ učí.

@@ -14,7 +14,6 @@ import com.example.vocabry.domain.model.WordFunctions
  */
 class WordRepository(private val dao: WordDao): WordFunctions {
 
-
     /**
      * Získa všetky slovíčka pre daný jazyk.
      *
@@ -24,7 +23,6 @@ class WordRepository(private val dao: WordDao): WordFunctions {
     override suspend fun getAllWords(language:String): List<Word> {
         return dao.getAllWords(language).map { it.toDomain() }
     }
-
 
     /**
      * Pridá nové slovíčko do databázy.
@@ -77,36 +75,6 @@ class WordRepository(private val dao: WordDao): WordFunctions {
      */
     override suspend fun getWordsByCategory(category: String,language:String): List<Word> {
         return dao.getWordsByCategory(category,language).map{it.toDomain()}
-    }
-
-    /**
-     * Vygeneruje štyri možnosti odpovedí do tlačidiel vrátane správnej odpovede.
-     *
-     * Ak je kategória "Chyby" alebo ak kategória nemá dosť slov na naplnenie všetkých tlačidiel, vyberie z celej databázy.
-     *
-     * @param correctWord Správna odpoveď.
-     * @param language Jazyk, ktorého sa otázka týka.
-     * @return Zoznam náhodných slov (vrátane správnej odpovede), premiešaných.
-     */
-    override suspend fun getButtonOptions(correctWord: Word,language: String): List<Word> {
-        val categoryWords = dao.getWordsByCategory(correctWord.category,language).filter { it.word != correctWord.word }
-        val wordList = if(correctWord.category == "Chyby"|| categoryWords.size < 3) {
-            dao.getAllWords(language).filter{it.word != correctWord.word}
-        } else {
-            categoryWords
-        }
-
-        val buttonList = mutableListOf<WordEntity>()
-        buttonList.clear()
-        buttonList.add(correctWord.toEntity())
-
-        while(buttonList.size < 4) {
-            val newWord = wordList.random()
-            if(buttonList.none { it.word == newWord.word }) {
-                buttonList.add(newWord)
-            }
-        }
-        return buttonList.shuffled().map {it.toDomain()}
     }
 
     /**

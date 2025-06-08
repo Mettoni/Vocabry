@@ -52,14 +52,7 @@ interface WordFunctions {
      *  @param language Jazyk v ktorom majú byť slovíčka z kategórie
      */
     suspend fun getWordsByCategory(category:String,language:String): List<Word>
-    /**
-     *  Vytvorí možnosti možnosti do tlačítok
-     *
-     *  @param correctWord Predstavuje hádané slovíčko
-     *  @param language Jazyk v ktorom majú byť slovíčka v tlačítkach
-     *  @return Slovíčka ktoré sa budú nachádzať v tlačítkach pod otázkou
-     */
-    suspend fun getButtonOptions(correctWord: Word, language: String): List<Word>
+
     /**
      * Získa zoznam všetkých dostupných jazykov zo zdroja
      * @return Zoznam unikátnych jazykov
