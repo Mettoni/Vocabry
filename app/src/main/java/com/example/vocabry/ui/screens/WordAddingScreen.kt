@@ -98,6 +98,9 @@ fun WordAddingScreen(
         }
 
     }
+    LaunchedEffect(selectedLanguage) {
+        languageViewModel.loadLanguages()
+    }
     Box(modifier = Modifier.background(Color(0xFF80B6F0)).fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.background),
@@ -261,9 +264,6 @@ fun CategoryDropdownWithInput(
     var expanded by remember { mutableStateOf(false) }
     var localInput by remember { mutableStateOf(selectedCategory) }
 
-    LaunchedEffect(selectedCategory) {
-        localInput = selectedCategory
-    }
     val filteredCategories = categories.filter {
         it.contains(localInput, ignoreCase = true)
     }
@@ -330,6 +330,10 @@ fun LanguageDropdownWithInput(
     var expanded by remember { mutableStateOf(false) }
     var localInput by remember { mutableStateOf(selectedLanguage) }
     var filteredLanguages by remember { mutableStateOf(languages) }
+
+    LaunchedEffect(selectedLanguage) {
+        localInput = selectedLanguage
+    }
 
     LaunchedEffect(localInput, languages) {
         filteredLanguages = languages.filter {
